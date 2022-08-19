@@ -4,7 +4,7 @@
         Enemy
     }
 
-    public class TeamUtils {
+    public static class TeamUtils {
         public static TeamMembership FromLayer(string layer) {
             return layer switch {
                 "Ally" => TeamMembership.Ally,

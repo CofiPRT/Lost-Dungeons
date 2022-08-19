@@ -4,15 +4,6 @@ namespace Character.Scripts {
     public class PlayerAnimator : MonoBehaviour {
         private Animator animator;
 
-        // save hashes for faster parameter acquisition
-        private static readonly int IsBlockingHash = Animator.StringToHash("isBlocking");
-        private static readonly int IsWalkingHash = Animator.StringToHash("isWalking");
-        private static readonly int IsRunningHash = Animator.StringToHash("isRunning");
-        private static readonly int AttackHash = Animator.StringToHash("attack");
-
-        private static readonly int AnimationSpeedHash = Animator.StringToHash("animationSpeed");
-        private static readonly int MovementSpeedHash = Animator.StringToHash("movementSpeed");
-        private static readonly int AttackSpeedHash = Animator.StringToHash("attackSpeed");
 
         private void Awake() {
             animator = GetComponent<Animator>();

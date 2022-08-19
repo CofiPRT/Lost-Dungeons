@@ -4,19 +4,26 @@ using UnityEngine;
 
 namespace Character.Scripts.BaseImplementations {
     public class SwordCharacter : Character, IHasWeapon {
-        private const float DefaultAttackDamage = 10;
-        private const float DefaultAttackSpeed = 1; // in attacks per second
-        private const float DefaultAttackRange = 1;
-        private const float DefaultAttackAngle = Mathf.PI / 4; // in radians
+        protected const float DefaultAttackDamage = 10;
+        protected const float DefaultAttackSpeed = 1; // in attacks per second
+        protected const float DefaultAttackRange = 1;
+        protected const float DefaultAttackAngle = Mathf.PI / 4; // in radians
 
-        public SwordCharacter(TeamMembership teamMembership, float maxHealth = DefaultMaxHealth)
-            : base(teamMembership, maxHealth) {
-            AttackDamage = DefaultAttackDamage;
-            AttackSpeed = DefaultAttackSpeed;
-            AttackCooldown = 0;
-            AttackRange = DefaultAttackRange;
-            AttackAngle = DefaultAttackAngle;
+        public SwordCharacter(
+            TeamMembership teamMembership,
+            float maxHealth = DefaultMaxHealth,
+            float attackDamage = DefaultAttackDamage,
+            float attackSpeed = DefaultAttackSpeed,
+            float attackRange = DefaultAttackRange,
+            float attackAngle = DefaultAttackAngle
+        ) : base(teamMembership, maxHealth) {
+            AttackDamage = attackDamage;
+            AttackSpeed = attackSpeed;
+            AttackRange = attackRange;
+            AttackAngle = attackAngle;
         }
+
+        /* IHasWeapon */
 
         public bool IsAttacking { get; set; }
         public float AttackDamage { get; }
@@ -26,7 +33,7 @@ namespace Character.Scripts.BaseImplementations {
         public float AttackAngle { get; }
 
         public void AttemptAttack(float damageMultiplier, AttackStrength attackStrength) {
-            if (!IsAttacking || IsStunned) return;
+            if (!IsAttacking) return;
 
             // find the direction of the attack
             var direction = transform.forward;
@@ -68,16 +75,17 @@ namespace Character.Scripts.BaseImplementations {
                 var angle = Vector3.Angle(direction, closeObjectPosition - currPosition);
                 if (angle > AttackAngle) continue;
 
-                // if the target has a shield, test whether they block this attack
-                if (closeObject is IHasShield shield) {
-                    shield.AttemptBlock(damage, attackStrength, this);
-                } else {
-                    var damageTaken = closeObject.TakeDamage(damage);
+                float damageDealt = 0;
 
-                    // notify self
-                    if (damageTaken > 0)
-                        OnAttackSuccess(closeObject, damageTaken);
-                }
+                // if the target has a shield, delegate the attack to it
+                if (closeObject is IHasShield shield)
+                    damageDealt = shield.AttemptBlock(damage, attackStrength, this);
+                else
+                    damageDealt = closeObject.TakeDamage(damage);
+
+                // notify self
+                if (damageDealt > 0)
+                    OnAttackSuccess(closeObject, damageDealt);
             }
         }
 
@@ -86,15 +94,34 @@ namespace Character.Scripts.BaseImplementations {
         }
 
         public void StartAttack() {
-            if (IsAttacking) return;
+            if (IsAttacking || IsStunned || AttackCooldown > 0) return;
 
             IsAttacking = true;
+            AttackCooldown = 1 / AttackSpeed;
         }
 
         public void EndAttack() {
             if (!IsAttacking) return;
 
             IsAttacking = false;
+        }
+
+        /* Parent */
+
+        public override bool AttemptStun(float stunDuration, Character source) {
+            if (!base.AttemptStun(stunDuration, source))
+                return false;
+
+            EndAttack();
+            return true;
+        }
+
+        /* Unity */
+
+        protected override void Update() {
+            base.Update();
+
+            AttackCooldown = Mathf.Max(0, AttackCooldown - Time.deltaTime);
         }
     }
 }

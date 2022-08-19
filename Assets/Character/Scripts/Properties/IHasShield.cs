@@ -1,8 +1,12 @@
 ﻿namespace Character.Scripts.Properties {
     public interface IHasShield {
-        bool IsBlocking { get; }
-        void AttemptBlock(float damage, AttackStrength attackStrength, IHasWeapon source);
-        void OnBlockSuccess(float damage, AttackStrength attackStrength, IHasWeapon source);
-        void OnBlockFail(float damage, AttackStrength attackStrength, IHasWeapon source);
+        bool IsBlocking { get; set; }
+        float ShieldAngle { get; }
+        float ShieldRechargeTime { get; }
+        float ShieldCooldown { get; set; }
+        BlockStrength BlockStrength { get; }
+        float AttemptBlock(float damage, AttackStrength attackStrength, BaseImplementations.Character source);
+        void StartBlocking();
+        void StopBlocking(bool forced = false);
     }
 }
