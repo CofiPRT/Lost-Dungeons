@@ -20,7 +20,7 @@ namespace Game {
         public Transform player2;
 
         public float gameTickSpeed = 1.0f;
-        public float playerTickFactor = 1.0f;
+        public float playerTickSpeed = 1.0f;
 
         public float changePlayerCooldown = 5.0f;
         private float changePlayerCooldownCurrent;
@@ -74,7 +74,7 @@ namespace Game {
         }
 
         public float GetPlayerTickSpeed() {
-            return gameTickSpeed * playerTickFactor;
+            return gameTickSpeed * playerTickSpeed;
         }
 
         private abstract class Action {

@@ -1,6 +1,6 @@
 ﻿namespace Character.Scripts.Properties {
     public interface IHasTeam {
-        TeamMembership TeamMembership { get; }
-        void OnKill(BaseImplementations.Character target);
+        Team Team { get; }
+        void OnKill(Base.Character target);
     }
 }

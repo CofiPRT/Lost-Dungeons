@@ -1,7 +1,7 @@
 ﻿using Character.Scripts.Properties;
 using UnityEngine;
 
-namespace Character.Scripts.BaseImplementations {
+namespace Character.Scripts.Base {
     public class KnightCharacter : SwordCharacter, IHasShield {
         private const float DefaultShieldAngle = Mathf.PI / 4;
         private const float DefaultShieldRechargeTime = 5; // seconds
@@ -10,7 +10,7 @@ namespace Character.Scripts.BaseImplementations {
         private const float FailedBlockStunDuration = 2; // seconds
 
         public KnightCharacter(
-            TeamMembership teamMembership,
+            Team team,
             float maxHealth = DefaultMaxHealth,
             float attackDamage = DefaultAttackDamage,
             float attackSpeed = DefaultAttackSpeed,
@@ -19,7 +19,7 @@ namespace Character.Scripts.BaseImplementations {
             float shieldAngle = DefaultShieldAngle,
             float shieldRechargeTime = DefaultShieldRechargeTime,
             BlockStrength blockStrength = DefaultBlockStrength
-        ) : base(teamMembership, maxHealth, attackDamage, attackSpeed, attackRange, attackAngle) {
+        ) : base(team, maxHealth, attackDamage, attackSpeed, attackRange, attackAngle) {
             ShieldAngle = shieldAngle;
             ShieldRechargeTime = shieldRechargeTime;
             BlockStrength = blockStrength;
@@ -76,11 +76,16 @@ namespace Character.Scripts.BaseImplementations {
             return 0;
         }
 
-        public void StartBlocking() {
-            if (IsBlocking || IsStunned || ShieldCooldown > 0)
-                return;
+        public bool CanStartBlocking => IsAlive && !IsBlocking && !IsStunned && !IsAttacking && ShieldCooldown == 0;
+
+        public void StartBlocking(Vector2 direction) {
+            if (!CanStartBlocking || direction.magnitude == 0) return;
 
             IsBlocking = true;
+            LookDirection = direction;
+            StopMoving();
+
+            Animator.SetBool(AnimatorHash.Blocking, true);
         }
 
         public void StopBlocking(bool force = false) {
@@ -90,9 +95,18 @@ namespace Character.Scripts.BaseImplementations {
             IsBlocking = false;
             if (force)
                 ShieldCooldown = ShieldRechargeTime;
+
+            Animator.SetBool(AnimatorHash.Blocking, false);
         }
 
         /* Parent */
+
+        public override void OnDeath() {
+            StopBlocking();
+            base.OnDeath();
+        }
+
+        public override bool CanApplyMovement => base.CanApplyMovement && !IsBlocking;
 
         public override bool AttemptStun(float stunDuration, Character source) {
             if (!base.AttemptStun(stunDuration, source))
@@ -102,12 +116,20 @@ namespace Character.Scripts.BaseImplementations {
             return true;
         }
 
+        public override void StartAttack(Vector2 direction) {
+            base.StartAttack(direction);
+
+            // attacking can override blocking
+            if (IsAttacking)
+                StopBlocking();
+        }
+
         /* Unity */
 
         protected override void Update() {
             base.Update();
 
-            ShieldCooldown = Mathf.Max(0, ShieldCooldown - Time.deltaTime);
+            ShieldCooldown = Mathf.Max(0, ShieldCooldown - DeltaTime);
         }
     }
 }

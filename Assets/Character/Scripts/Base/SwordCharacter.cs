@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Character.Scripts.Properties;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-namespace Character.Scripts.BaseImplementations {
+namespace Character.Scripts.Base {
     public class SwordCharacter : Character, IHasWeapon {
         protected const float DefaultAttackDamage = 10;
         protected const float DefaultAttackSpeed = 1; // in attacks per second
@@ -10,13 +13,13 @@ namespace Character.Scripts.BaseImplementations {
         protected const float DefaultAttackAngle = Mathf.PI / 4; // in radians
 
         public SwordCharacter(
-            TeamMembership teamMembership,
+            Team team,
             float maxHealth = DefaultMaxHealth,
             float attackDamage = DefaultAttackDamage,
             float attackSpeed = DefaultAttackSpeed,
             float attackRange = DefaultAttackRange,
             float attackAngle = DefaultAttackAngle
-        ) : base(teamMembership, maxHealth) {
+        ) : base(team, maxHealth) {
             AttackDamage = attackDamage;
             AttackSpeed = attackSpeed;
             AttackRange = attackRange;
@@ -31,6 +34,13 @@ namespace Character.Scripts.BaseImplementations {
         public float AttackCooldown { get; set; }
         public float AttackRange { get; }
         public float AttackAngle { get; }
+
+        public IEnumerable<Team> AttackableTeams => Team switch {
+            Team.Player => new[] { Team.Enemy },
+            Team.Ally => new[] { Team.Enemy },
+            Team.Enemy => new[] { Team.Player, Team.Ally },
+            _ => Array.Empty<Team>()
+        };
 
         public void AttemptAttack(float damageMultiplier, AttackStrength attackStrength) {
             if (!IsAttacking) return;
@@ -51,7 +61,11 @@ namespace Character.Scripts.BaseImplementations {
                     currPosition,
                     new Vector3(AttackRange, AttackRange, AttackRange),
                     transform.rotation,
-                    LayerMask.GetMask(TeamUtils.Opposite(TeamUtils.ToLayer(TeamMembership)))
+                    LayerMask.GetMask(
+                        AttackableTeams
+                            .Select(TeamUtils.ToLayer)
+                            .ToArray()
+                    )
                 )
                 .Select(x => x.gameObject.GetComponent<Character>())
                 .ToList();
@@ -75,7 +89,7 @@ namespace Character.Scripts.BaseImplementations {
                 var angle = Vector3.Angle(direction, closeObjectPosition - currPosition);
                 if (angle > AttackAngle) continue;
 
-                float damageDealt = 0;
+                float damageDealt;
 
                 // if the target has a shield, delegate the attack to it
                 if (closeObject is IHasShield shield)
@@ -93,20 +107,34 @@ namespace Character.Scripts.BaseImplementations {
             // intentionally left blank
         }
 
-        public void StartAttack() {
-            if (IsAttacking || IsStunned || AttackCooldown > 0) return;
+        public bool CanStartAttack => IsAlive && !IsAttacking && !IsStunned && AttackCooldown == 0;
+
+        public virtual void StartAttack(Vector2 direction) {
+            if (!CanStartAttack) return;
 
             IsAttacking = true;
             AttackCooldown = 1 / AttackSpeed;
+            LookDirection = direction;
+            StopMoving();
+
+            // random attack animation out of two available
+            Animator.SetInteger(AnimatorHash.Attacking, Random.Range(1, 3));
+            Animator.SetFloat(AnimatorHash.AttackSpeed, AttackSpeed * TickSpeed);
         }
 
         public void EndAttack() {
             if (!IsAttacking) return;
 
             IsAttacking = false;
+            Animator.SetInteger(AnimatorHash.Attacking, 0);
         }
 
         /* Parent */
+
+        public override void OnDeath() {
+            EndAttack();
+            base.OnDeath();
+        }
 
         public override bool AttemptStun(float stunDuration, Character source) {
             if (!base.AttemptStun(stunDuration, source))
@@ -116,12 +144,16 @@ namespace Character.Scripts.BaseImplementations {
             return true;
         }
 
+        public override bool CanApplyMovement => base.CanApplyMovement && !IsAttacking;
+
         /* Unity */
 
         protected override void Update() {
             base.Update();
 
-            AttackCooldown = Mathf.Max(0, AttackCooldown - Time.deltaTime);
+            if (!IsAlive) return;
+
+            AttackCooldown = Mathf.Max(0, AttackCooldown - DeltaTime);
         }
     }
 }
