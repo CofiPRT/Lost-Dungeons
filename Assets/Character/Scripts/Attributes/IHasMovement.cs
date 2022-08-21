@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Character.Scripts.Properties {
+namespace Character.Scripts.Attributes {
     public interface IHasMovement {
         Rigidbody RigidBody { get; set; }
         Vector2 LookDirection { get; set; }

@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Character.Scripts.Attributes;
 using Character.Scripts.Properties;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Character.Scripts.Base {
-    public class SwordCharacter : Character, IHasWeapon {
+namespace Character.Scripts.Generic {
+    public abstract class SwordCharacter : Character, IHasWeapon {
         protected const float DefaultAttackDamage = 10;
         protected const float DefaultAttackSpeed = 1; // in attacks per second
         protected const float DefaultAttackRange = 1;
         protected const float DefaultAttackAngle = Mathf.PI / 4; // in radians
 
-        public SwordCharacter(
+        protected SwordCharacter(
             Team team,
             float maxHealth = DefaultMaxHealth,
             float attackDamage = DefaultAttackDamage,

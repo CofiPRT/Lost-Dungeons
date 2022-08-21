@@ -1,16 +1,23 @@
 ﻿using System;
+using Character.Scripts.Attributes;
 using Character.Scripts.Properties;
 using Game;
 using UnityEngine;
 
-namespace Character.Scripts.Base {
-    public class Character : MonoBehaviour, IHasTeam, IHasAI, IHasMovement, IHasAnimator, IHasHealth, IStunnable {
+namespace Character.Scripts.Generic {
+    public abstract class Character : MonoBehaviour,
+        IHasTeam,
+        IHasAI,
+        IHasMovement,
+        IHasAnimator,
+        IHasHealth,
+        IStunnable {
         protected const float DefaultMaxHealth = 100;
         private static readonly Vector2 DefaultLookDirection = Vector2.up;
         private const float DefaultRotationSpeed = 5.0f;
         private const float DefaultDecayTime = 10; // after this many seconds, the character will be destroyed
 
-        public Character(Team team, float maxHealth = DefaultMaxHealth) {
+        protected Character(Team team, float maxHealth = DefaultMaxHealth) {
             Team = team;
 
             Health = maxHealth;

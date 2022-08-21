@@ -1,15 +1,16 @@
-﻿using Character.Scripts.Properties;
+﻿using Character.Scripts.Attributes;
+using Character.Scripts.Properties;
 using UnityEngine;
 
-namespace Character.Scripts.Base {
-    public class KnightCharacter : SwordCharacter, IHasShield {
-        private const float DefaultShieldAngle = Mathf.PI / 4;
-        private const float DefaultShieldRechargeTime = 5; // seconds
-        private const BlockStrength DefaultBlockStrength = BlockStrength.Weak;
+namespace Character.Scripts.Generic {
+    public abstract class KnightCharacter : SwordCharacter, IHasShield {
+        protected const float DefaultShieldAngle = Mathf.PI / 4;
+        protected const float DefaultShieldRechargeTime = 5; // seconds
+        protected const BlockStrength DefaultBlockStrength = BlockStrength.Weak;
 
         private const float FailedBlockStunDuration = 2; // seconds
 
-        public KnightCharacter(
+        protected KnightCharacter(
             Team team,
             float maxHealth = DefaultMaxHealth,
             float attackDamage = DefaultAttackDamage,

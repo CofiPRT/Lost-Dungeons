@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Character.Scripts.Properties {
+namespace Character.Scripts.Attributes {
     public interface IHasAnimator {
         Animator Animator { get; set; }
         float DeltaTime { get; }
