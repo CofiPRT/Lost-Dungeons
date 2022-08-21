@@ -5,20 +5,20 @@ namespace Character.Scripts.Abilities {
     public abstract class Ability {
         internal readonly CasterCharacter user;
         private readonly AbilityPhase[] phases;
-        private readonly bool useUserDeltaTime;
+        private readonly AbilityPhase finalPhase;
         private readonly float cooldown;
 
         private int currentPhase;
         private float currentCooldown;
         private bool active;
+        private bool aborted;
 
-        internal float DeltaTime => useUserDeltaTime ? user.DeltaTime : Time.deltaTime;
-
-        protected Ability(AbilityPhase[] phases, CasterCharacter user, float cooldown, bool useUserDeltaTime = true) {
+        protected Ability(AbilityPhase[] phases, CasterCharacter user, float cooldown, AbilityPhase finalPhase = null) {
             this.phases = phases;
             this.user = user;
             this.cooldown = cooldown;
-            this.useUserDeltaTime = useUserDeltaTime;
+
+            this.finalPhase = finalPhase ?? new DefaultFinalPhase(this);
         }
 
         public bool Use() {
@@ -26,115 +26,52 @@ namespace Character.Scripts.Abilities {
             if (currentCooldown > 0)
                 return false;
 
-            currentPhase = 0;
-            active = true;
+            // if already active, offer a reactivation to the current phase
+            if (active)
+                phases[currentPhase].OnReactivation();
+            else
+                Reset();
 
             return true;
         }
 
         public void Update() {
-            currentCooldown = Mathf.Max(0, currentCooldown - DeltaTime);
+            currentCooldown = Mathf.Max(0, currentCooldown - user.DeltaTime);
 
             // only update while active
             if (!active)
                 return;
 
-            // a true result indicates the ability can continue running
-            if (phases[currentPhase].Update()) return;
-            
-            // otherwise, the ability is stopped
-            EndAbility();
+            // offer a tick to the current phase
+            var phase = phases[currentPhase];
+            phase.Tick();
+
+            // advance to the next phase if the current one is done
+            if (phase.Finished)
+                currentPhase++;
+
+            // if we've run through all the phases, or the ability has been aborted, end it
+            if (currentPhase >= phases.Length || aborted)
+                finalPhase.Tick(); // at its end, the end phase should deactivate this ability
         }
 
-        public void AdvancePhase() {
-            currentPhase++;
-        }
-
-        private void EndAbility() {
+        internal void StartCooldown() {
             active = false;
             currentCooldown = cooldown;
         }
 
-        public void Reset() {
+        internal void Abort() {
+            aborted = true;
+        }
+
+        private void Reset() {
+            currentCooldown = 0;
+            currentPhase = 0;
+            aborted = false;
+            active = true;
+
             foreach (var phase in phases)
                 phase.Reset();
-        }
-    }
-
-    public abstract class AbilityPhase {
-        private readonly Ability ability;
-        private readonly float initialManaCost;
-        private readonly float manaCostPerSecond;
-        private readonly float maxDuration;
-
-        private bool started;
-        private float secondCounter;
-        private float duration;
-
-        protected AbilityPhase(
-            Ability ability,
-            float initialManaCost = 0,
-            float manaCostPerSecond = 0,
-            float maxDuration = float.MaxValue
-        ) {
-            this.ability = ability;
-            this.initialManaCost = initialManaCost;
-            this.manaCostPerSecond = manaCostPerSecond;
-            this.maxDuration = maxDuration;
-        }
-
-        public bool Update() {
-            // if this is the first tick of the ability, attempt to consume the initial amount of mana
-            if (!started) {
-                if (!ability.user.UseMana(initialManaCost))
-                    return false; // not enough mana
-                
-                // the ability has been successfully started
-                started = true;
-                
-                OnStart();
-                return true;
-            }
-            
-            // test if the ability should end
-            duration += ability.DeltaTime;
-            if (duration > maxDuration) {
-                OnEnd();
-                return false; // duration exceeded
-            }
-
-            // consume the mana cost per second
-            secondCounter += ability.DeltaTime;
-            if (secondCounter > 1) {
-                // consume mana and reset the counter
-                secondCounter -= 1;
-                if (!ability.user.UseMana(manaCostPerSecond)) {
-                    OnEnd();
-                    return false; // not enough mana
-                }
-            }
-            
-            // the ability may receive another tick of update
-            OnTick();
-            return true;
-        }
-
-        protected virtual void OnStart() {
-            OnTick(); // by default, offer one tick of update
-        }
-        
-        protected virtual void OnTick() {
-            // intentionally blank
-        }
-        
-        protected virtual void OnEnd() {
-            ability.AdvancePhase();
-        }
-
-        internal virtual void Reset() {
-            started = false;
-            secondCounter = 0;
-            duration = 0;
         }
     }
 }
