@@ -1,22 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Character.Attributes;
 using Properties;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Character.Implementation.Base {
-    public abstract class SwordCharacter : GenericCharacter, IHasWeapon {
-        protected SwordCharacter(CharacterData data) : base(data) {
-            AttackDamage = data.attackDamage;
-            AttackSpeed = data.attackSpeed;
-            AttackRange = data.attackRange;
-            AttackAngle = data.attackAngle;
-        }
-
-        /* IHasWeapon */
-
+    public abstract partial class GenericCharacter {
         public bool IsAttacking { get; set; }
         public float AttackDamage { get; }
         public float AttackSpeed { get; }
@@ -75,13 +65,8 @@ namespace Character.Implementation.Base {
                 var angle = Vector3.Angle(direction, closeObjectPosition - currPosition);
                 if (angle > AttackAngle) continue;
 
-                float damageDealt;
-
-                // if the target has a shield, delegate the attack to it
-                if (opponent is IHasShield shield)
-                    damageDealt = shield.AttemptBlock(damage, attackStrength, this);
-                else
-                    damageDealt = opponent.TakeDamage(damage);
+                // delegate the attack to the shield wielder
+                var damageDealt = opponent.AttemptBlock(damage, attackStrength, this);
 
                 // notify self
                 if (damageDealt > 0)
@@ -102,6 +87,9 @@ namespace Character.Implementation.Base {
             AttackCooldown = 1 / AttackSpeed;
             LookDirection = direction;
 
+            // attacking can override blocking
+            StopBlocking();
+
             // random attack animation out of two available
             Animator.SetInteger(AnimatorHash.Attacking, Random.Range(1, 3));
             Animator.SetFloat(AnimatorHash.AttackTickSpeed, AttackSpeed * TickSpeed);
@@ -120,24 +108,5 @@ namespace Character.Implementation.Base {
 
             AttackCooldown = Mathf.Max(0, AttackCooldown - DeltaTime);
         }
-
-        /* Parent */
-
-        public override void OnDeath() {
-            EndAttack();
-            base.OnDeath();
-        }
-
-        public override bool AttemptStun(float stunDuration, GenericCharacter source) {
-            if (!base.AttemptStun(stunDuration, source))
-                return false;
-
-            EndAttack();
-            return true;
-        }
-
-        /* Unity */
-
-        protected override UpdateDelegate UpdateActions => base.UpdateActions + UpdateAttackCooldown;
     }
 }

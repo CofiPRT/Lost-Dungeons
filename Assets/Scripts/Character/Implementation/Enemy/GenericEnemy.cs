@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Character.Implementation.Ally;
 using Character.Implementation.Base;
@@ -8,165 +7,156 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Character.Implementation.Enemy {
-    public abstract class GenericEnemy : KnightCharacter {
+    public abstract class GenericEnemy : GenericCharacter {
         private const float SearchRadius = 10f;
 
-        protected GenericEnemy(CharacterData data) : base(SetTeam(data)) { }
+        protected GenericEnemy(CharacterBuilder data) : base(SetTeam(data)) {
+            AIChecks = new BaseAICheck[] {
+                new FightCheck(this),
+                new BetterFightCheck(this),
+                new RangeCheck(this)
+            };
+        }
 
-        private static CharacterData SetTeam(CharacterData data) {
+        private static CharacterBuilder SetTeam(CharacterBuilder data) {
             data.team = Team.Enemy;
             return data;
         }
 
         private FairFight fairFight;
 
-        /* IHasAI */
+        private class FightCheck : BaseAICheck {
+            private new readonly GenericEnemy instance;
 
-        public override void UpdateAI() {
-            searchForFightCooldown = Mathf.Max(0, searchForFightCooldown - DeltaTime);
-            if (searchForFightCooldown == 0) {
-                searchForFightCooldown = Random.Range(2, 3);
-                SearchForFight();
+            public FightCheck(GenericEnemy instance) : base(instance, 2, 3) {
+                this.instance = instance;
             }
 
-            searchForAvailableOpponentCooldown = Mathf.Max(0, searchForAvailableOpponentCooldown - DeltaTime);
-            if (searchForAvailableOpponentCooldown == 0) {
-                searchForAvailableOpponentCooldown = Random.Range(2, 3);
-                SearchForAvailableOpponent();
-            }
+            protected override void Perform() {
+                if (instance.fairFight != null)
+                    return; // already in a fight
 
-            moveIntoRangeCooldown = Mathf.Max(0, moveIntoRangeCooldown - DeltaTime);
-            if (moveIntoRangeCooldown == 0) {
-                moveIntoRangeCooldown = Random.Range(2, 3);
-                MoveIntoRange();
-            }
-            
-            performAttackCooldown = Mathf.Max(0, performAttackCooldown - DeltaTime);
-            if (performAttackCooldown == 0) {
-                performAttackCooldown = Random.Range(2, 3);
-                PerformAttack();
+                // look for a fight - search for an opponent in a radius
+                var opponents = instance.FindOpponents();
+
+                // sort opponents and choose the first
+                opponents.Sort();
+
+                // if there are no opponents, there's nothing to do
+                if (opponents.Count == 0)
+                    return;
+
+                var opponent = opponents[0];
+
+                // subscribe to this fight
+                instance.fairFight = opponent.FairFight;
+                instance.fairFight.Subscribe(instance);
             }
         }
 
-        private float searchForFightCooldown;
+        private class BetterFightCheck : BaseAICheck {
+            private new readonly GenericEnemy instance;
 
-        private void SearchForFight() {
-            if (fairFight != null)
-                return; // already in a fight
+            public BetterFightCheck(GenericEnemy instance) : base(instance, 2, 3) {
+                this.instance = instance;
+            }
 
-            // look for a fight - search for an opponent in a radius
-            var opponents = FindOpponents();
+            protected override void Perform() {
+                // if we're in a fight, and waiting, attempt to search for a more available opponent
+                if (instance.fairFight == null || instance.fairFight.IsFighting(instance))
+                    return;
 
-            // sort opponents and choose the first
-            opponents.Sort();
+                var opponents = instance.FindOpponents();
+                opponents.Sort();
 
-            // if there are no opponents, there's nothing to do
-            if (opponents.Count == 0)
-                return;
+                var opponent = opponents.Where(
+                        opponent => !opponent.FairFight.MaxFightingEnemiesReached
+                    )
+                    .FirstOrDefault(null!);
 
-            var opponent = opponents[0];
+                // if there's no such opponent, there's nothing to do
+                if (opponent == null)
+                    return;
 
-            // subscribe to this fight
-            fairFight = opponent.FairFight;
-            fairFight.Subscribe(this);
+                // unsubscribe from the current fight and subscribe to the new one
+                instance.fairFight.Unsubscribe(instance);
+                instance.fairFight = opponent.FairFight;
+                instance.fairFight.Subscribe(instance);
+            }
         }
 
-        private float searchForAvailableOpponentCooldown;
+        private class RangeCheck : BaseAICheck {
+            private new readonly GenericEnemy instance;
 
-        private void SearchForAvailableOpponent() {
-            // if we're in a fight, and waiting, attempt to search for a more available opponent
-            if (fairFight == null || fairFight.IsFighting(this))
-                return;
+            public RangeCheck(GenericEnemy instance) : base(instance, 2, 3) {
+                this.instance = instance;
+            }
 
-            var opponents = FindOpponents();
-            opponents.Sort();
+            protected override void Perform() {
+                if (instance.fairFight == null)
+                    return; // not in a fight or already moving into range
 
-            var opponent = opponents.Where(
-                    opponent => !opponent.FairFight.MaxFightingEnemiesReached
-                )
-                .FirstOrDefault(null!);
+                var desiredRange = instance.fairFight.IsFighting(instance) ? 2f : 5f;
+                var deviatedRange = desiredRange + Random.Range(-0.5f, 0.5f);
 
-            // if there's no such opponent, there's nothing to do
-            if (opponent == null)
-                return;
+                var opponentPos = instance.fairFight.Owner.Pos2D;
+                var ownPos = instance.Pos2D;
 
-            // unsubscribe from the current fight and subscribe to the new one
-            fairFight.Unsubscribe(this);
-            fairFight = opponent.FairFight;
-            fairFight.Subscribe(this);
+                var direction = (opponentPos - ownPos).normalized;
+                var desiredAngle = Mathf.Atan2(direction.y, direction.x);
+                var angleDeviation = instance.fairFight.IsFighting(instance) ? 0f : Mathf.PI / 4;
+                var deviatedAngle = desiredAngle + Random.Range(-angleDeviation, angleDeviation);
+
+                var destination = opponentPos + new Vector2(
+                    deviatedRange * Mathf.Cos(deviatedAngle),
+                    deviatedRange * Mathf.Sin(deviatedAngle)
+                );
+
+                var run = Vector2.Distance(ownPos, opponentPos) > 5.5f;
+
+                instance.AIAction = new AIMoveAction(instance, destination, run);
+            }
         }
 
-        private float moveIntoRangeCooldown;
-        private AIMoveAction moveIntoRangeAction;
+        // public override void RunAITick() {
+        //     performAttackCooldown = Mathf.Max(0, performAttackCooldown - DeltaTime);
+        //     if (performAttackCooldown == 0) {
+        //         performAttackCooldown = Random.Range(2, 3);
+        //         PerformAttack();
+        //     }
+        // }
 
-        private void MoveIntoRange() {
-            if (fairFight == null || moveIntoRangeAction != null)
-                return; // not in a fight or already moving into range
-
-            var desiredRange = fairFight.IsFighting(this) ? 2f : 5f;
-            var deviatedRange = desiredRange + Random.Range(-0.5f, 0.5f);
-
-            var opponentPos3 = fairFight.Owner.transform.position;
-            var opponentPos = new Vector2(opponentPos3.x, opponentPos3.z);
-            
-            var ownPos3 = transform.position;
-            var ownPos = new Vector2(ownPos3.x, ownPos3.z);
-            
-            var direction = (opponentPos - ownPos).normalized;
-            var desiredAngle = Mathf.Atan2(direction.y, direction.x);
-            var angleDeviation = fairFight.IsFighting(this) ? 0f : Mathf.PI / 4;
-            var deviatedAngle = desiredAngle + Random.Range(-angleDeviation, angleDeviation);
-
-            var destination = opponentPos + new Vector2(
-                deviatedRange * Mathf.Cos(deviatedAngle),
-                deviatedRange * Mathf.Sin(deviatedAngle)
-            );
-            
-            moveIntoRangeAction = new AIMoveAction(this, destination);
-        }
-
-        private class AIMoveAction {
-            private readonly GenericEnemy instance;
+        private class AIMoveAction : BaseAIAction {
+            private new readonly GenericEnemy instance;
             private readonly Vector2 destination;
             private readonly bool run;
-            private readonly float maxDuration;
-            private float duration;
 
-            public AIMoveAction(GenericEnemy instance, Vector2 destination, bool run = true, float maxDuration = 5) {
+            public AIMoveAction(GenericEnemy instance, Vector2 destination, bool run = true, float maxDuration = 5)
+                : base(instance, maxDuration) {
                 this.instance = instance;
                 this.destination = destination;
                 this.run = run;
-                this.maxDuration = maxDuration;
             }
 
-            public void Update() {
-                var ownPos3 = instance.transform.position;
-                var ownPos = new Vector2(ownPos3.x, ownPos3.z);
-                
+            protected override void RunTick() {
+                var ownPos = instance.Pos2D;
+
                 if (Vector2.Distance(ownPos, destination) < 0.5f) {
-                    instance.moveIntoRangeAction = null; // reached destination
+                    End(); // reached destination
                     return;
                 }
-                
+
                 var direction = (destination - ownPos).normalized;
                 var syncLookDirection = instance.fairFight == null;
-                
-                instance.ApplyMovement(direction, run, syncLookDirection);
-                
-                duration += Time.deltaTime;
-                if (duration > maxDuration)
-                    instance.moveIntoRangeAction = null; // ran for too long
-            }
-        }
 
-        private void UpdateAIAction() {
-            moveIntoRangeAction?.Update();
+                instance.ApplyMovement(direction, run, syncLookDirection);
+            }
         }
 
         private List<GenericAlly> FindOpponents() {
             // ReSharper disable once Unity.PreferNonAllocApi
             return Physics.OverlapSphere(
-                    transform.position,
+                    Pos,
                     SearchRadius,
                     LayerMask.GetMask(AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
                 )
@@ -174,9 +164,5 @@ namespace Character.Implementation.Enemy {
                 .Where(x => x != null)
                 .ToList();
         }
-        
-        /* Unity */
-
-        protected override UpdateDelegate UpdateActions => base.UpdateActions + UpdateAIAction;
     }
 }

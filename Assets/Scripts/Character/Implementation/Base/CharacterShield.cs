@@ -1,19 +1,9 @@
-﻿using Character.Attributes;
-using Properties;
+﻿using Properties;
 using UnityEngine;
 
 namespace Character.Implementation.Base {
-    public abstract class KnightCharacter : SwordCharacter, IHasShield {
+    public abstract partial class GenericCharacter {
         private const float FailedBlockStunDuration = 2; // seconds
-
-        protected KnightCharacter(CharacterData data) : base(data) {
-            ShieldAngle = data.shieldAngle;
-            ShieldRechargeTime = data.shieldRechargeTime;
-            BlockStrength = data.blockStrength;
-        }
-
-        /* IHasShield */
-
         public bool IsBlocking { get; set; }
         public float ShieldAngle { get; }
         public float ShieldRechargeTime { get; }
@@ -22,6 +12,14 @@ namespace Character.Implementation.Base {
 
         public float AttemptBlock(float damage, AttackStrength attackStrength, GenericCharacter source) {
             if (!IsBlocking || IsStunned)
+                return damage;
+
+            // if the attack is not within shield angle, block is not successful
+            var attackDirection = source.Pos2D - Pos2D;
+            var blockDirection = Forward2D;
+
+            var angle = Vector2.Angle(attackDirection, blockDirection);
+            if (angle > ShieldAngle)
                 return damage;
 
             // compute how strong the attack is compared to the blocking power
@@ -89,32 +87,5 @@ namespace Character.Implementation.Base {
         public void UpdateShieldCooldown() {
             ShieldCooldown = Mathf.Max(0, ShieldCooldown - DeltaTime);
         }
-
-        /* Parent */
-
-        public override void OnDeath() {
-            StopBlocking();
-            base.OnDeath();
-        }
-
-        public override bool AttemptStun(float stunDuration, GenericCharacter source) {
-            if (!base.AttemptStun(stunDuration, source))
-                return false;
-
-            StopBlocking(true);
-            return true;
-        }
-
-        public override void StartAttack(Vector2 direction) {
-            base.StartAttack(direction);
-
-            // attacking can override blocking
-            if (IsAttacking)
-                StopBlocking();
-        }
-
-        /* Unity */
-
-        protected override UpdateDelegate UpdateActions => base.UpdateActions + UpdateShieldCooldown;
     }
 }

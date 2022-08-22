@@ -3,7 +3,7 @@ using Properties;
 using UnityEngine;
 
 namespace Character.Implementation.Base {
-    public class CharacterData {
+    public class CharacterBuilder {
         /* IHasTeam */
 
         private const Team DefaultTeam = Team.Enemy;

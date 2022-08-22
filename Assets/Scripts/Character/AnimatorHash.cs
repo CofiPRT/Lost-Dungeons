@@ -1,12 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Character.Attributes {
-    public interface IHasAnimator {
-        Animator Animator { get; set; }
-        float DeltaTime { get; }
-        float TickSpeed { get; }
-    }
-
+namespace Character.Implementation.Base {
     public static class AnimatorHash {
         // save hashes for faster parameter acquisition
         public static readonly int ForwardSpeed = Animator.StringToHash("forwardSpeed");
