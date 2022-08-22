@@ -1,8 +1,8 @@
 ﻿using System;
-using Scripts.Character.Abilities;
-using Scripts.Character.Attributes;
+using Character.Abilities;
+using Character.Attributes;
 
-namespace Scripts.Character.Implementation.Base {
+namespace Character.Implementation.Base {
     public abstract class CasterCharacter : KnightCharacter, IHasMana, IHasAbilities {
         protected CasterCharacter(CharacterData data) : base(data) {
             Mana = data.maxMana;
@@ -29,6 +29,7 @@ namespace Scripts.Character.Implementation.Base {
 
         /* IHasAbilities */
 
+        public bool CastBlocksMovement { get; set; }
         public Ability[] Abilities { get; }
 
         public bool UseAbility(int index) {
@@ -42,6 +43,10 @@ namespace Scripts.Character.Implementation.Base {
             foreach (var ability in Abilities)
                 ability.Update();
         }
+
+        /* Parent */
+
+        public override bool CanApplyMovement => base.CanApplyMovement && !CastBlocksMovement;
 
         /* Unity */
 

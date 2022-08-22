@@ -1,4 +1,4 @@
-﻿namespace Scripts.Character.Attributes {
+﻿namespace Character.Attributes {
     public interface IHasHealth {
         bool IsAlive { get; }
         float DeathTime { get; set; }

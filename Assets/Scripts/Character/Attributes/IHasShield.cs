@@ -1,7 +1,7 @@
-﻿using Scripts.Properties;
+﻿using Properties;
 using UnityEngine;
 
-namespace Scripts.Character.Attributes {
+namespace Character.Attributes {
     public interface IHasShield {
         bool IsBlocking { get; set; }
         float ShieldAngle { get; }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Scripts.Properties;
+using Properties;
 using UnityEngine;
 
-namespace Scripts.Character.Attributes {
+namespace Character.Attributes {
     public interface IHasWeapon {
         bool IsAttacking { get; set; }
         float AttackDamage { get; }

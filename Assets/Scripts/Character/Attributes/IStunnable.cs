@@ -1,4 +1,4 @@
-﻿namespace Scripts.Character.Attributes {
+﻿namespace Character.Attributes {
     public interface IStunnable {
         float StunDuration { get; set; }
         bool IsStunned { get; }

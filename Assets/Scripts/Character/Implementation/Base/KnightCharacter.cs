@@ -1,8 +1,8 @@
-﻿using Scripts.Character.Attributes;
-using Scripts.Properties;
+﻿using Character.Attributes;
+using Properties;
 using UnityEngine;
 
-namespace Scripts.Character.Implementation.Base {
+namespace Character.Implementation.Base {
     public abstract class KnightCharacter : SwordCharacter, IHasShield {
         private const float FailedBlockStunDuration = 2; // seconds
 
@@ -96,8 +96,6 @@ namespace Scripts.Character.Implementation.Base {
             StopBlocking();
             base.OnDeath();
         }
-
-        public override bool CanApplyMovement => base.CanApplyMovement && !IsBlocking;
 
         public override bool AttemptStun(float stunDuration, GenericCharacter source) {
             if (!base.AttemptStun(stunDuration, source))

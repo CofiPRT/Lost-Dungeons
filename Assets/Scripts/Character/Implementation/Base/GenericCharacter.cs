@@ -1,10 +1,10 @@
 ﻿using System;
-using Scripts.Character.Attributes;
-using Scripts.Game;
-using Scripts.Properties;
+using Character.Attributes;
+using Game;
+using Properties;
 using UnityEngine;
 
-namespace Scripts.Character.Implementation.Base {
+namespace Character.Implementation.Base {
     public abstract class GenericCharacter : MonoBehaviour,
         IHasTeam,
         IHasAI,
@@ -12,6 +12,8 @@ namespace Scripts.Character.Implementation.Base {
         IHasAnimator,
         IHasHealth,
         IStunnable {
+        private const float DefaultAcceleration = 1.0f;
+        private const float DefaultDeceleration = 0.5f;
         private static readonly Vector2 DefaultLookDirection = Vector2.up;
         private const float DefaultRotationSpeed = 5.0f;
         private const float DefaultDecayTime = 10; // after this many seconds, the character will be destroyed
@@ -22,6 +24,8 @@ namespace Scripts.Character.Implementation.Base {
             Health = data.maxHealth;
             MaxHealth = data.maxHealth;
 
+            Acceleration = DefaultAcceleration;
+            Deceleration = DefaultDeceleration;
             LookDirection = DefaultLookDirection;
             RotationSpeed = DefaultRotationSpeed;
 
@@ -39,40 +43,82 @@ namespace Scripts.Character.Implementation.Base {
 
         /* IHasAI */
 
+        public Func<bool> AIAction { get; set; }
         public bool UseAI { get; set; }
 
         public void SetAI(bool useAI) {
             UseAI = useAI;
         }
 
-        public virtual void RunAI() {
-            // intentionally left blank
+        public virtual void UpdateAI() {
+            if (!UseAI)
+                return;
+
+            if (AIAction?.Invoke() ?? false)
+                AIAction = null;
         }
 
         /* IHasMovement */
 
         public Rigidbody RigidBody { get; set; }
         public Vector2 LookDirection { get; set; }
+        public Vector2 MovementApplication { get; set; }
+        public bool MovementRun { get; set; }
+        public float Velocity { get; set; }
+        public float Acceleration { get; }
+        public float Deceleration { get; }
         public float RotationSpeed { get; }
         public float MovementSpeedFactor => 1;
         public virtual bool CanApplyMovement => IsAlive && !IsStunned;
 
-        public virtual void ApplyMovement(Vector2 direction, bool run) {
+        public void ApplyMovement(Vector2 direction, bool run, bool syncLookDirection) {
             if (!CanApplyMovement || direction.magnitude == 0)
                 StopMoving();
 
-            // assure the direction is normalized
-            LookDirection = direction;
+            if (syncLookDirection)
+                LookDirection = direction;
 
-            // update the animator
-            Animator.SetBool(AnimatorHash.Walking, true);
-            Animator.SetBool(AnimatorHash.Running, run);
-            Animator.SetFloat(AnimatorHash.MovementSpeed, MovementSpeedFactor * TickSpeed);
+            // compute the signed angle difference between the movement direction and the look direction
+            var angleDiff = Vector2.SignedAngle(LookDirection, direction);
+
+            // the animator will be instructed to move according to this relative direction
+            var relativeMovementDirection = new Vector2(Mathf.Cos(angleDiff), -Mathf.Sin(angleDiff));
+
+            MovementApplication = relativeMovementDirection;
+            MovementRun = run;
+        }
+
+        public void UpdateMovement() {
+            Animator.SetFloat(AnimatorHash.MovementTickSpeed, MovementSpeedFactor * TickSpeed);
+
+            if (MovementApplication == Vector2.zero) {
+                // apply deceleration
+                Velocity = Mathf.Clamp(Velocity - Deceleration * DeltaTime, 0, Velocity);
+                return;
+            }
+
+            // else, instruct the animator to match the movement, and reset the movement application
+            var maxVelocity = MovementRun ? 2.0f : 1.0f;
+
+            Velocity = Velocity > maxVelocity
+                ? Mathf.Clamp(Velocity - Deceleration * DeltaTime, 0, Velocity)
+                : Mathf.Clamp(Velocity + Acceleration * DeltaTime, 0, maxVelocity);
+
+            // the velocity defines the magnitude of the movement
+            var movement = MovementApplication * Velocity;
+            SetAnimatorMovementSpeed(movement.x, movement.y);
+
+            MovementApplication = Vector2.zero;
         }
 
         public void StopMoving() {
-            Animator.SetBool(AnimatorHash.Walking, false);
-            Animator.SetBool(AnimatorHash.Running, false);
+            Velocity = 0;
+            SetAnimatorMovementSpeed(0, 0);
+        }
+
+        private void SetAnimatorMovementSpeed(float forward, float side) {
+            Animator.SetFloat(AnimatorHash.ForwardSpeed, forward);
+            Animator.SetFloat(AnimatorHash.SideSpeed, side);
         }
 
         public void UpdateLookDirection() {
@@ -87,6 +133,9 @@ namespace Scripts.Character.Implementation.Base {
             // smooth lerp
             var speed = RotationSpeed * DeltaTime;
             RigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, rotation, speed));
+
+            // update the animator
+            Animator.SetFloat(AnimatorHash.AnimationTickSpeed, TickSpeed);
         }
 
         /* IHasAnimator */
@@ -194,7 +243,9 @@ namespace Scripts.Character.Implementation.Base {
         protected virtual UpdateDelegate UpdateActions => delegate {
             UpdateDeathTime();
             UpdateStunDuration();
+            UpdateMovement();
             UpdateLookDirection();
+            UpdateAI();
         };
 
         protected virtual void Update() {

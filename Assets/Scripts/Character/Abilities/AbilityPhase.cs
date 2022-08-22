@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Scripts.Character.Abilities {
+namespace Character.Abilities {
     public abstract class AbilityPhase {
         protected readonly Ability ability;
         private readonly float manaCostPerSecond;

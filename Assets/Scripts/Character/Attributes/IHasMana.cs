@@ -1,4 +1,4 @@
-﻿namespace Scripts.Character.Attributes {
+﻿namespace Character.Attributes {
     public interface IHasMana {
         float Mana { get; set; }
         float MaxMana { get; }

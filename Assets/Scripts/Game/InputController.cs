@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scripts.Game {
+namespace Game {
     public class InputController : MonoBehaviour {
         public static bool AttackPressed() {
             return Input.GetKey(KeyCode.Mouse0);

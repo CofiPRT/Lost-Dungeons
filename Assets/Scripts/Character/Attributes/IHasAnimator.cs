@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Scripts.Character.Attributes {
+namespace Character.Attributes {
     public interface IHasAnimator {
         Animator Animator { get; set; }
         float DeltaTime { get; }
@@ -9,15 +9,17 @@ namespace Scripts.Character.Attributes {
 
     public static class AnimatorHash {
         // save hashes for faster parameter acquisition
+        public static readonly int ForwardSpeed = Animator.StringToHash("forwardSpeed");
+        public static readonly int SideSpeed = Animator.StringToHash("sideSpeed");
+
         public static readonly int Blocking = Animator.StringToHash("blocking");
-        public static readonly int Walking = Animator.StringToHash("walking");
-        public static readonly int Running = Animator.StringToHash("running");
         public static readonly int Attacking = Animator.StringToHash("attacking");
+
         public static readonly int Stunned = Animator.StringToHash("stunned");
         public static readonly int Dead = Animator.StringToHash("dead");
 
-        public static readonly int AnimationSpeed = Animator.StringToHash("animationSpeed");
-        public static readonly int MovementSpeed = Animator.StringToHash("movementSpeed");
-        public static readonly int AttackSpeed = Animator.StringToHash("attackSpeed");
+        public static readonly int AnimationTickSpeed = Animator.StringToHash("animationTickSpeed");
+        public static readonly int MovementTickSpeed = Animator.StringToHash("movementTickSpeed");
+        public static readonly int AttackTickSpeed = Animator.StringToHash("attackTickSpeed");
     }
 }

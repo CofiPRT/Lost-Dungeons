@@ -1,8 +1,8 @@
-﻿using Scripts.Character.Abilities;
-using Scripts.Properties;
+﻿using Character.Abilities;
+using Properties;
 using UnityEngine;
 
-namespace Scripts.Character.Implementation.Base {
+namespace Character.Implementation.Base {
     public class CharacterData {
         /* IHasTeam */
 

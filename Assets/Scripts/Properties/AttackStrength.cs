@@ -1,4 +1,4 @@
-﻿namespace Scripts.Properties {
+﻿namespace Properties {
     public enum AttackStrength {
         Weak,
         Medium,

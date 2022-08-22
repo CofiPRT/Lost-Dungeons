@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Scripts.Character.Attributes;
-using Scripts.Properties;
+using Character.Attributes;
+using Properties;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Scripts.Character.Implementation.Base {
+namespace Character.Implementation.Base {
     public abstract class SwordCharacter : GenericCharacter, IHasWeapon {
         protected SwordCharacter(CharacterData data) : base(data) {
             AttackDamage = data.attackDamage;
@@ -46,28 +46,25 @@ namespace Scripts.Character.Implementation.Base {
             var currPosition = transform.position;
 
             // ReSharper disable once Unity.PreferNonAllocApi - we want every object in the range to be checked
-            var closeObjects = Physics.OverlapBox(
+            var opponents = Physics.OverlapBox(
                     currPosition,
                     new Vector3(AttackRange, AttackRange, AttackRange),
                     transform.rotation,
-                    LayerMask.GetMask(
-                        AttackableTeams
-                            .Select(TeamUtils.ToLayer)
-                            .ToArray()
-                    )
+                    LayerMask.GetMask(AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
                 )
                 .Select(x => x.gameObject.GetComponent<GenericCharacter>())
+                .Where(x => x != null)
                 .ToList();
 
             // if no objects were hit, abort early
-            if (closeObjects.Count == 0) return;
+            if (opponents.Count == 0) return;
 
             var damage = (int)(AttackDamage * damageMultiplier);
 
             // the height difference is already accounted for, only check if the target is within the circle sector
-            foreach (var closeObject in closeObjects) {
+            foreach (var opponent in opponents) {
                 // disregard the y position
-                var closeObjectPosition = closeObject.transform.position;
+                var closeObjectPosition = opponent.transform.position;
                 closeObjectPosition.y = currPosition.y;
 
                 // the distance must be within range
@@ -81,14 +78,14 @@ namespace Scripts.Character.Implementation.Base {
                 float damageDealt;
 
                 // if the target has a shield, delegate the attack to it
-                if (closeObject is IHasShield shield)
+                if (opponent is IHasShield shield)
                     damageDealt = shield.AttemptBlock(damage, attackStrength, this);
                 else
-                    damageDealt = closeObject.TakeDamage(damage);
+                    damageDealt = opponent.TakeDamage(damage);
 
                 // notify self
                 if (damageDealt > 0)
-                    OnAttackSuccess(closeObject, damageDealt);
+                    OnAttackSuccess(opponent, damageDealt);
             }
         }
 
@@ -104,11 +101,10 @@ namespace Scripts.Character.Implementation.Base {
             IsAttacking = true;
             AttackCooldown = 1 / AttackSpeed;
             LookDirection = direction;
-            StopMoving();
 
             // random attack animation out of two available
             Animator.SetInteger(AnimatorHash.Attacking, Random.Range(1, 3));
-            Animator.SetFloat(AnimatorHash.AttackSpeed, AttackSpeed * TickSpeed);
+            Animator.SetFloat(AnimatorHash.AttackTickSpeed, AttackSpeed * TickSpeed);
         }
 
         public void EndAttack() {
@@ -139,8 +135,6 @@ namespace Scripts.Character.Implementation.Base {
             EndAttack();
             return true;
         }
-
-        public override bool CanApplyMovement => base.CanApplyMovement && !IsAttacking;
 
         /* Unity */
 

@@ -1,8 +1,8 @@
 using System;
-using Scripts.Game;
+using Game;
 using UnityEngine;
 
-namespace Scripts.Camera {
+namespace Camera {
     public class CameraController : MonoBehaviour {
         private const double DistanceEqualsTolerance = 10e-3;
 

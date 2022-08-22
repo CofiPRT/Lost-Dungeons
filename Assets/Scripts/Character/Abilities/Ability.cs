@@ -1,7 +1,7 @@
-﻿using Scripts.Character.Implementation.Base;
+﻿using Character.Implementation.Base;
 using UnityEngine;
 
-namespace Scripts.Character.Abilities {
+namespace Character.Abilities {
     public abstract class Ability {
         internal readonly CasterCharacter user;
         private readonly AbilityPhase[] phases;

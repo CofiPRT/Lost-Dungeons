@@ -1,6 +1,6 @@
-﻿using Scripts.Properties;
+﻿using Properties;
 
-namespace Scripts.Character.Attributes {
+namespace Character.Attributes {
     public interface IHasTeam {
         Team Team { get; }
         void OnKill(Implementation.Base.GenericCharacter target);

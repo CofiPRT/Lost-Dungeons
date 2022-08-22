@@ -1,4 +1,4 @@
-﻿namespace Scripts.Character.Abilities {
+﻿namespace Character.Abilities {
     public class DefaultFinalPhase : AbilityPhase {
         public DefaultFinalPhase(
             Ability ability,

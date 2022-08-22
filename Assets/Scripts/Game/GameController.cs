@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace Scripts.Game {
+namespace Game {
     public class GameController : MonoBehaviour {
         // singleton
         public static GameController Instance { get; private set; }
