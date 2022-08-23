@@ -13,6 +13,7 @@ namespace Character.Abilities {
         private float secondCounter;
         private float duration;
 
+        private float Coefficient => Mathf.Clamp01(duration / maxDuration);
         private float DeltaTime => useUserDelta ? ability.user.DeltaTime : Time.deltaTime;
         internal bool Finished => duration > maxDuration;
 

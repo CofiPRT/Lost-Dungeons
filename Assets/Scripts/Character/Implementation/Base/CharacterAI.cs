@@ -1,15 +1,19 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
         public BaseAIAction AIAction { get; set; }
-        public BaseAICheck[] AIChecks { get; set; }
-        public bool UseAI { get; set; }
+        protected BaseAICheck[] AIChecks { get; set; }
+        private bool UseAI { get; set; }
 
         public void SetAI(bool useAI) {
+            var prevAI = UseAI;
             UseAI = useAI;
+
+            // if the AI has been toggled, remove the action
+            if (prevAI != UseAI)
+                AIAction = null;
         }
 
         public void UpdateAI() {
@@ -21,7 +25,7 @@ namespace Character.Implementation.Base {
                 check.Update();
 
             // offer a game tick to the current action if any
-            AIAction?.Update();
+            AIAction?.Tick();
         }
 
         public abstract class BaseAICheck {
@@ -51,26 +55,39 @@ namespace Character.Implementation.Base {
         public abstract class BaseAIAction {
             protected readonly GenericCharacter instance;
             private readonly float maxDuration;
+
             private float duration;
+            private bool started;
 
             public BaseAIAction(GenericCharacter instance, float maxDuration = Mathf.Infinity) {
                 this.instance = instance;
                 this.maxDuration = maxDuration;
             }
 
-            public void Update() {
-                RunTick();
+            public void Tick() {
+                if (!started) {
+                    OnStart();
+                    started = true;
+                }
+
+                OnUpdate();
 
                 duration += instance.DeltaTime;
                 if (duration >= maxDuration)
-                    End();
+                    OnEnd();
             }
 
-            protected void End() {
+            protected virtual void OnStart() {
+                // intentionally left blank
+            }
+
+            protected virtual void OnUpdate() {
+                // intentionally left blank
+            }
+
+            protected virtual void OnEnd() {
                 instance.AIAction = null;
             }
-
-            protected abstract void RunTick();
         }
     }
 }

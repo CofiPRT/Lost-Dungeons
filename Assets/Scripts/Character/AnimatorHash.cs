@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Character.Implementation.Base {
+namespace Character {
     public static class AnimatorHash {
         // save hashes for faster parameter acquisition
         public static readonly int ForwardSpeed = Animator.StringToHash("forwardSpeed");

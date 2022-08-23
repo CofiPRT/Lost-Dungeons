@@ -1,3 +1,4 @@
+using Character.Implementation.Player;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -15,8 +16,9 @@ namespace Game {
         }
 
         // game data
-        public Transform player1;
-        public Transform player2;
+        public GenericPlayer player1;
+        public GenericPlayer player2;
+        public GenericPlayer controllerPlayer;
 
         public float gameTickSpeed = 1.0f;
         public float playerTickFactor = 1.0f;

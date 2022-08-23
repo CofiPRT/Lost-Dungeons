@@ -80,7 +80,7 @@ namespace Character.Implementation.Base {
 
         public bool CanStartAttack => IsAlive && !IsAttacking && !IsStunned && AttackCooldown == 0;
 
-        public virtual void StartAttack(Vector2 direction) {
+        public void StartAttack(Vector2 direction) {
             if (!CanStartAttack) return;
 
             IsAttacking = true;

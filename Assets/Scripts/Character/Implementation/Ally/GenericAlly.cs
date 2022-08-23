@@ -1,18 +1,21 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Character.Implementation.Ally.AIChecks;
 using Character.Implementation.Base;
-using Properties;
+using Character.Implementation.Player;
+using Game;
 
 namespace Character.Implementation.Ally {
-    public class GenericAlly : KnightCharacter {
-        protected GenericAlly(CharacterBuilder data) : base(SetTeam(data)) {
+    public class GenericAlly : GenericCharacter {
+        protected GenericAlly(CharacterBuilder data) : base(data) {
             FairFight = new FairFight(this);
-        }
-
-        private static CharacterBuilder SetTeam(CharacterBuilder data) {
-            data.team = Team.Enemy;
-            return data;
+            AIChecks = new BaseAICheck[] {
+                new AllyFollowCheck(this),
+                new AllyAttackCheck(this),
+                new AllyBlockCheck(this),
+                new AllyWanderCheck(this)
+            };
         }
 
         public FairFight FairFight { get; }
+        public GenericPlayer Leader => GameController.Instance.controllerPlayer;
     }
 }

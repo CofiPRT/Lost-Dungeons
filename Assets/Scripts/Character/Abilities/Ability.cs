@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Character.Abilities {
     public abstract class Ability {
-        internal readonly CasterCharacter user;
+        internal readonly GenericCharacter user;
         private readonly AbilityPhase[] phases;
         private readonly AbilityPhase finalPhase;
         private readonly float cooldown;
@@ -13,7 +13,12 @@ namespace Character.Abilities {
         private bool active;
         private bool aborted;
 
-        protected Ability(AbilityPhase[] phases, CasterCharacter user, float cooldown, AbilityPhase finalPhase = null) {
+        protected Ability(
+            AbilityPhase[] phases,
+            GenericCharacter user,
+            float cooldown,
+            AbilityPhase finalPhase = null
+        ) {
             this.phases = phases;
             this.user = user;
             this.cooldown = cooldown;
@@ -42,6 +47,12 @@ namespace Character.Abilities {
             if (!active)
                 return;
 
+            // if we've run through all the phases, or the ability has been aborted, end it
+            if (currentPhase >= phases.Length || aborted) {
+                finalPhase.Tick(); // at its end, the end phase should deactivate this ability
+                return;
+            }
+
             // offer a tick to the current phase
             var phase = phases[currentPhase];
             phase.Tick();
@@ -49,10 +60,6 @@ namespace Character.Abilities {
             // advance to the next phase if the current one is done
             if (phase.Finished)
                 currentPhase++;
-
-            // if we've run through all the phases, or the ability has been aborted, end it
-            if (currentPhase >= phases.Length || aborted)
-                finalPhase.Tick(); // at its end, the end phase should deactivate this ability
         }
 
         internal void StartCooldown() {
