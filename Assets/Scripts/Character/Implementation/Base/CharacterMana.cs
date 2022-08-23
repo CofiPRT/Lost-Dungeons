@@ -5,16 +5,20 @@ namespace Character.Implementation.Base {
         public float Mana { get; set; }
         public float MaxMana { get; }
 
-        public bool UseMana(float manaCost) {
-            if (Mana < manaCost)
+        public bool HasMana(float amount) {
+            return Mana >= amount;
+        }
+
+        public bool UseMana(float amount) {
+            if (!HasMana(amount))
                 return false; // not enough mana to complete action
 
-            Mana -= manaCost;
+            Mana -= amount;
             return true;
         }
 
-        public void ReplenishMana(float manaAmount) {
-            Mana = Mathf.Min(Mana + manaAmount, MaxMana);
+        public void ReplenishMana(float amount) {
+            Mana = Mathf.Min(Mana + amount, MaxMana);
         }
     }
 }

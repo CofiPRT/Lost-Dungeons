@@ -6,7 +6,7 @@
             float maxDuration = 0,
             bool useUserDelta = true,
             bool requireReactivation = false
-        ) : base(ability, manaCostPerSecond, maxDuration, useUserDelta, requireReactivation) { }
+        ) : base(ability, maxDuration, useUserDelta, requireReactivation, manaCostPerSecond) { }
 
         protected override void OnEnd() {
             ability.StartCooldown();

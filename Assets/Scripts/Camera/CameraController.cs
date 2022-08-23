@@ -16,6 +16,9 @@ namespace Camera {
                 Instance = this;
         }
 
+        public static Vector3 Forward => Instance.transform.forward;
+        public static Vector2 Forward2D => new Vector2(Forward.x, Forward.z).normalized;
+
         [Range(0.1f, 20.0f)] public float smoothSpeed = 10f; // for lerping
 
         public float heightFromTarget;

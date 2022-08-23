@@ -13,22 +13,22 @@ namespace Character.Abilities {
         private float secondCounter;
         private float duration;
 
-        private float Coefficient => Mathf.Clamp01(duration / maxDuration);
+        protected float Coefficient => Mathf.Clamp01(duration / maxDuration);
         private float DeltaTime => useUserDelta ? ability.user.DeltaTime : Time.deltaTime;
         internal bool Finished => duration > maxDuration;
 
         protected AbilityPhase(
             Ability ability,
-            float manaCostPerSecond = 0,
             float maxDuration = float.MaxValue,
             bool useUserDelta = true,
-            bool requireReactivation = false
+            bool requireReactivation = false,
+            float manaCostPerSecond = 0
         ) {
             this.ability = ability;
-            this.manaCostPerSecond = manaCostPerSecond;
             this.maxDuration = maxDuration;
             this.useUserDelta = useUserDelta;
             this.requireReactivation = requireReactivation;
+            this.manaCostPerSecond = manaCostPerSecond;
         }
 
         public void Tick() {

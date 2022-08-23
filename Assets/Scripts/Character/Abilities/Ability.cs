@@ -1,29 +1,26 @@
-﻿using Character.Implementation.Base;
+﻿using System;
+using Character.Implementation.Base;
+using Character.Implementation.Player;
 using UnityEngine;
 
 namespace Character.Abilities {
     public abstract class Ability {
-        internal readonly GenericCharacter user;
-        private readonly AbilityPhase[] phases;
-        private readonly AbilityPhase finalPhase;
+        internal readonly GenericPlayer user;
         private readonly float cooldown;
+
+        protected AbilityPhase[] phases = Array.Empty<AbilityPhase>();
+        protected AbilityPhase finalPhase;
 
         private int currentPhase;
         private float currentCooldown;
         private bool active;
         private bool aborted;
 
-        protected Ability(
-            AbilityPhase[] phases,
-            GenericCharacter user,
-            float cooldown,
-            AbilityPhase finalPhase = null
-        ) {
-            this.phases = phases;
+        protected Ability(GenericPlayer user, float cooldown) {
             this.user = user;
             this.cooldown = cooldown;
 
-            this.finalPhase = finalPhase ?? new DefaultFinalPhase(this);
+            finalPhase = new DefaultFinalPhase(this);
         }
 
         public bool Use() {

@@ -3,6 +3,10 @@
 namespace Character {
     public static class AnimatorHash {
         // save hashes for faster parameter acquisition
+        public static readonly int AnimationTickSpeed = Animator.StringToHash("animationTickSpeed");
+        public static readonly int MovementTickSpeed = Animator.StringToHash("movementTickSpeed");
+        public static readonly int AttackTickSpeed = Animator.StringToHash("attackTickSpeed");
+
         public static readonly int ForwardSpeed = Animator.StringToHash("forwardSpeed");
         public static readonly int SideSpeed = Animator.StringToHash("sideSpeed");
 
@@ -12,8 +16,9 @@ namespace Character {
         public static readonly int Stunned = Animator.StringToHash("stunned");
         public static readonly int Dead = Animator.StringToHash("dead");
 
-        public static readonly int AnimationTickSpeed = Animator.StringToHash("animationTickSpeed");
-        public static readonly int MovementTickSpeed = Animator.StringToHash("movementTickSpeed");
-        public static readonly int AttackTickSpeed = Animator.StringToHash("attackTickSpeed");
+        public static readonly int DodgingForward = Animator.StringToHash("dodgingForward");
+        public static readonly int DodgingBackward = Animator.StringToHash("dodgingBackward");
+        public static readonly int DodgingLeft = Animator.StringToHash("dodgingLeft");
+        public static readonly int DodgingRight = Animator.StringToHash("dodgingRight");
     }
 }

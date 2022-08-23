@@ -4,7 +4,7 @@ using Character.Implementation.Player;
 using Game;
 
 namespace Character.Implementation.Ally {
-    public class GenericAlly : GenericCharacter {
+    public abstract class GenericAlly : GenericCharacter {
         protected GenericAlly(CharacterBuilder data) : base(data) {
             FairFight = new FairFight(this);
             AIChecks = new BaseAICheck[] {

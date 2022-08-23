@@ -8,6 +8,7 @@ using Random = UnityEngine.Random;
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
         public bool IsAttacking { get; set; }
+        public bool IsPreparingToAttack { get; set; }
         public float AttackDamage { get; }
         public float AttackSpeed { get; }
         public float AttackCooldown { get; set; }
@@ -24,47 +25,12 @@ namespace Character.Implementation.Base {
         public void AttemptAttack(float damageMultiplier, AttackStrength attackStrength) {
             if (!IsAttacking) return;
 
-            // find the direction of the attack
-            var direction = transform.forward;
-
-            // make the direction parallel to the ground - remove the y component
-            direction.y = 0;
-            direction.Normalize();
-
-
-            // check for attack-able objects in the attack range - first obtain a box overlap
-            var currPosition = transform.position;
-
-            // ReSharper disable once Unity.PreferNonAllocApi - we want every object in the range to be checked
-            var opponents = Physics.OverlapBox(
-                    currPosition,
-                    new Vector3(AttackRange, AttackRange, AttackRange),
-                    transform.rotation,
-                    LayerMask.GetMask(AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
-                )
-                .Select(x => x.gameObject.GetComponent<GenericCharacter>())
-                .Where(x => x != null)
-                .ToList();
-
-            // if no objects were hit, abort early
-            if (opponents.Count == 0) return;
+            IsPreparingToAttack = false;
 
             var damage = (int)(AttackDamage * damageMultiplier);
+            var opponents = GetOpponentsInAttackArea();
 
-            // the height difference is already accounted for, only check if the target is within the circle sector
             foreach (var opponent in opponents) {
-                // disregard the y position
-                var closeObjectPosition = opponent.transform.position;
-                closeObjectPosition.y = currPosition.y;
-
-                // the distance must be within range
-                var distance = (closeObjectPosition - currPosition).magnitude;
-                if (distance > AttackRange) continue;
-
-                // the angle must be within the sector
-                var angle = Vector3.Angle(direction, closeObjectPosition - currPosition);
-                if (angle > AttackAngle) continue;
-
                 // delegate the attack to the shield wielder
                 var damageDealt = opponent.AttemptBlock(damage, attackStrength, this);
 
@@ -72,6 +38,41 @@ namespace Character.Implementation.Base {
                 if (damageDealt > 0)
                     OnAttackSuccess(opponent, damageDealt);
             }
+        }
+
+        public List<GenericCharacter> GetOpponentsInAttackRange() {
+            // ReSharper disable once Unity.PreferNonAllocApi - we want every object in the range to be checked
+            return Physics.OverlapSphere(
+                    Pos,
+                    AttackRange,
+                    LayerMask.GetMask(AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
+                )
+                .Select(x => x.gameObject.GetComponent<GenericCharacter>())
+                .Where(x => x != null)
+                .ToList();
+        }
+
+        public IEnumerable<GenericCharacter> GetOpponentsInAttackArea() {
+            // check for attack-able objects in the attack range - first obtain a sphere overlap
+            var opponents = GetOpponentsInAttackRange();
+
+            // if no objects were hit, abort early
+            if (opponents.Count == 0) return Array.Empty<GenericCharacter>();
+
+            // the height difference is already accounted for, only check if the target is within the circle sector
+            return opponents.Where(OpponentInAttackArea).ToArray();
+        }
+
+        public bool OpponentInAttackArea(GenericCharacter opponent) {
+            var opponentPos = opponent.Pos2D;
+
+            // the distance must be within range
+            var distance = (opponentPos - Pos2D).magnitude;
+            if (distance > AttackRange) return false;
+
+            // the angle must be within the sector
+            var angle = Vector2.Angle(Forward2D, opponentPos - Pos2D);
+            return angle <= AttackAngle;
         }
 
         public void OnAttackSuccess(GenericCharacter target, float damageDealt) {
@@ -84,6 +85,7 @@ namespace Character.Implementation.Base {
             if (!CanStartAttack) return;
 
             IsAttacking = true;
+            IsPreparingToAttack = true;
             AttackCooldown = 1 / AttackSpeed;
             LookDirection = direction;
 

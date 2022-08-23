@@ -1,6 +1,4 @@
-﻿using System;
-using Character.Abilities;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter : MonoBehaviour {
@@ -32,17 +30,16 @@ namespace Character.Implementation.Base {
 
             Mana = data.maxMana;
             MaxMana = data.maxMana;
-            Abilities = data.abilities ?? Array.Empty<Ability>();
 
             // by default, the AI is enabled
-            UseAI = true;
+            SetAI(true);
         }
 
         public Vector3 Pos => transform.position;
-        public Vector2 Pos2D => new Vector2(transform.position.x, transform.position.z);
+        public Vector2 Pos2D => new Vector2(Pos.x, Pos.z);
 
         public Vector3 Forward => transform.forward;
-        public Vector2 Forward2D => new Vector2(transform.forward.x, transform.forward.z);
+        public Vector2 Forward2D => new Vector2(Forward.x, Forward.z).normalized;
 
         protected virtual void Awake() {
             Animator = GetComponent<Animator>();
@@ -59,7 +56,6 @@ namespace Character.Implementation.Base {
             UpdateAI();
             UpdateAttackCooldown();
             UpdateShieldCooldown();
-            UpdateAbilities();
         };
 
         protected virtual void Update() {

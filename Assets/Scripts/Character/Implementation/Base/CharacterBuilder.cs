@@ -43,11 +43,5 @@ namespace Character.Implementation.Base {
         private const float DefaultMaxMana = 100;
 
         public float maxMana = DefaultMaxMana;
-
-        /* IHasAbilities */
-
-        private const Ability[] DefaultAbilities = null;
-
-        public Ability[] abilities = DefaultAbilities;
     }
 }

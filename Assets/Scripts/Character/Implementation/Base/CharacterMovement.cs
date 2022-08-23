@@ -11,7 +11,7 @@ namespace Character.Implementation.Base {
         public float Deceleration { get; }
         public float RotationSpeed { get; }
         public float MovementSpeedFactor => 1;
-        public bool CanApplyMovement => IsAlive && !IsStunned && !CastBlocksMovement;
+        public virtual bool CanApplyMovement => IsAlive && !IsStunned;
 
         public void ApplyMovement(Vector2 direction, bool run, bool syncLookDirection) {
             if (!CanApplyMovement || direction.magnitude == 0)
