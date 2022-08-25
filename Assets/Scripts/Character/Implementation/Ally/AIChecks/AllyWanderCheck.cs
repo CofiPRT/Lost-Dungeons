@@ -11,7 +11,7 @@ namespace Character.Implementation.Ally.AIChecks {
         }
 
         protected override void Perform() {
-            if (instance.FairFight != null)
+            if (instance.FairFight.InFight)
                 return; // only wander when not in a fight
 
             var distToLeader = Vector2.Distance(instance.Leader.Pos2D, instance.Pos2D);

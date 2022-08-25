@@ -31,8 +31,17 @@ namespace Character.Implementation.Enemy {
                     LayerMask.GetMask(AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
                 )
                 .Select(x => x.GetComponent<GenericAlly>())
-                .Where(x => x != null)
+                .Where(x => x != null && x.IsAlive)
                 .ToList();
+        }
+
+        /* Parent */
+
+        public override Vector2 LookDirection => FairFight != null ? FairFight.Owner.Pos2D - Pos2D : Forward2D;
+        
+        public override void OnDeath() {
+            base.OnDeath();
+            FairFight?.Unsubscribe(this);
         }
     }
 }

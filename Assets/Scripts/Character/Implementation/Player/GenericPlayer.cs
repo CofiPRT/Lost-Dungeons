@@ -24,6 +24,7 @@ namespace Character.Implementation.Player {
 
         /* Ability Logic */
 
+        public bool CastBlocksAbilityUsage { get; set; }
         public bool CastBlocksMovement { get; set; }
 
         public IEnumerable<Ability> Abilities => new[]

@@ -2,6 +2,7 @@
 using Character.Implementation.Base;
 using Character.Implementation.Player;
 using Game;
+using UnityEngine;
 
 namespace Character.Implementation.Ally {
     public abstract class GenericAlly : GenericCharacter {
@@ -16,6 +17,20 @@ namespace Character.Implementation.Ally {
         }
 
         public FairFight FairFight { get; }
-        public GenericPlayer Leader => GameController.Instance.controllerPlayer;
+        public GenericPlayer Leader => GameController.ControllerPlayer;
+
+        /* Parent */
+
+        public override Vector2 LookDirection =>
+            FairFight.InFight ? FairFight.LastFoughtEnemy.Pos2D - Pos2D : Forward2D;
+
+        public override void OnAttackSuccess(GenericCharacter target, float damageDealt) {
+            FairFight.LastFoughtEnemy = target;
+            FairFight.ForceSubscribe(target);
+        }
+        
+        public override void OnDamageTaken(float damageTaken, GenericCharacter source) {
+            FairFight.LastFoughtEnemy = source;
+        }
     }
 }

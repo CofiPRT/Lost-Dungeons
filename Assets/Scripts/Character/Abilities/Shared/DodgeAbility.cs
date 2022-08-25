@@ -1,13 +1,19 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Camera;
 using Character.Implementation.Player;
 using Game;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Character.Abilities.Shared {
     public class DodgeAbility : Ability {
         private const float Cooldown = 5f;
+
+        private static readonly Color VignetteColor = Color.white;
+        private const float VignetteIntensity = 0.25f;
+        private const float FilmGrainIntensity = 1.0f;
+        private const float LensDistortionIntensity = -0.5f;
+
         private DashDirection dashDirection;
         private bool dodged;
 
@@ -49,6 +55,8 @@ namespace Character.Abilities.Shared {
 
                 // run the animation
                 ability.user.Animator.SetBool(ability.Hash, true);
+                ability.user.CastBlocksAbilityUsage = true;
+                ability.user.CastBlocksMovement = true;
 
                 // test if the player dodged an attack
                 ability.dodged = ability.user.GetOpponentsInAttackRange()
@@ -66,23 +74,46 @@ namespace Character.Abilities.Shared {
                 this.ability = ability;
             }
 
+            protected override void OnStart() {
+                if (!ability.dodged)
+                    return;
+
+                // prepare the visual effects
+                EffectsController.FilmGrain.active = true;
+                EffectsController.Vignette.active = true;
+                EffectsController.Vignette.color = new ColorParameter(VignetteColor);
+                EffectsController.MotionBlur.active = true;
+            }
+
             protected override void OnUpdate() {
                 if (!ability.dodged)
                     return;
 
                 // lerp the game speed and the player speed
-                GameController.Instance.gameTickSpeed = Mathf.Lerp(1.0f, 0.1f, Coefficient);
-                GameController.Instance.playerTickFactor = Mathf.Lerp(1.0f, 5.0f, Coefficient);
+                GameController.GameTickSpeed = Mathf.Lerp(1.0f, 0.1f, Coefficient);
+                GameController.PlayerTickFactor = Mathf.Lerp(1.0f, 5.0f, Coefficient);
+
+                // lerp effects
+                EffectsController.FilmGrain.intensity.value = Mathf.Lerp(0.0f, FilmGrainIntensity, Coefficient);
+                EffectsController.Vignette.intensity.value = Mathf.Lerp(0.0f, VignetteIntensity, Coefficient);
+                EffectsController.LensDistortion.intensity.value =
+                    Mathf.Lerp(0.0f, LensDistortionIntensity, Coefficient);
             }
 
             protected override void OnEnd() {
                 // stop the animation
                 ability.user.Animator.SetBool(ability.Hash, false);
+                ability.user.CastBlocksMovement = false;
 
                 // if the player dodged an attack, ensure the lerps are finished
                 if (ability.dodged) {
-                    GameController.Instance.gameTickSpeed = 0.1f;
-                    GameController.Instance.playerTickFactor = 5.0f;
+                    GameController.GameTickSpeed = 0.1f;
+                    GameController.PlayerTickFactor = 5.0f;
+
+                    // also ensure camera effect lerps are finished
+                    EffectsController.FilmGrain.intensity.value = FilmGrainIntensity;
+                    EffectsController.Vignette.intensity.value = VignetteIntensity;
+                    EffectsController.LensDistortion.intensity.value = LensDistortionIntensity;
                 } else {
                     // skip Phase3 if the player didn't dodge an attack
                     ability.Abort();
@@ -99,14 +130,29 @@ namespace Character.Abilities.Shared {
 
             protected override void OnUpdate() {
                 // lerp the game speed and the player speed back
-                GameController.Instance.gameTickSpeed = Mathf.Lerp(0.1f, 1.0f, Coefficient);
-                GameController.Instance.playerTickFactor = Mathf.Lerp(5.0f, 1.0f, Coefficient);
+                GameController.GameTickSpeed = Mathf.Lerp(0.1f, 1.0f, Coefficient);
+                GameController.PlayerTickFactor = Mathf.Lerp(5.0f, 1.0f, Coefficient);
+
+                // lerp the camera effects back to normal
+                EffectsController.FilmGrain.intensity.value = Mathf.Lerp(FilmGrainIntensity, 0.0f, Coefficient);
+                EffectsController.Vignette.intensity.value = Mathf.Lerp(VignetteIntensity, 0.0f, Coefficient);
+                EffectsController.LensDistortion.intensity.value =
+                    Mathf.Lerp(LensDistortionIntensity, 0.0f, Coefficient);
             }
 
             protected override void OnEnd() {
                 // ensure the lerps are finished
-                GameController.Instance.gameTickSpeed = 1.0f;
-                GameController.Instance.playerTickFactor = 1.0f;
+                GameController.GameTickSpeed = 1.0f;
+                GameController.PlayerTickFactor = 1.0f;
+
+                // stop the visual effects
+                EffectsController.FilmGrain.active = false;
+                EffectsController.Vignette.active = false;
+                EffectsController.MotionBlur.active = false;
+
+                // allow the player to use abilities again
+                ability.user.CastBlocksAbilityUsage = false;
+
                 base.OnEnd();
             }
         }

@@ -48,7 +48,7 @@ namespace Character.Implementation.Base {
                     LayerMask.GetMask(AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
                 )
                 .Select(x => x.gameObject.GetComponent<GenericCharacter>())
-                .Where(x => x != null)
+                .Where(x => x != null && x.IsAlive)
                 .ToList();
         }
 
@@ -75,7 +75,7 @@ namespace Character.Implementation.Base {
             return angle <= AttackAngle;
         }
 
-        public void OnAttackSuccess(GenericCharacter target, float damageDealt) {
+        public virtual void OnAttackSuccess(GenericCharacter target, float damageDealt) {
             // intentionally left blank
         }
 

@@ -3,10 +3,10 @@
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
         public Rigidbody RigidBody { get; set; }
-        public Vector2 LookDirection { get; set; }
+        public virtual Vector2 LookDirection { get; set; }
         public Vector2 MovementApplication { get; set; }
         public bool MovementRun { get; set; }
-        public float Velocity { get; set; }
+        public Vector2 Velocity { get; set; }
         public float Acceleration { get; }
         public float Deceleration { get; }
         public float RotationSpeed { get; }
@@ -30,32 +30,49 @@ namespace Character.Implementation.Base {
             MovementRun = run;
         }
 
-        public void UpdateMovement() {
-            Animator.SetFloat(AnimatorHash.MovementTickSpeed, MovementSpeedFactor * TickSpeed);
+        private void ApplyDeceleration() {
+            if (Velocity.magnitude == 0)
+                return; // no deceleration if we're not moving
 
-            if (MovementApplication == Vector2.zero) {
-                // apply deceleration
-                Velocity = Mathf.Clamp(Velocity - Deceleration * DeltaTime, 0, Velocity);
-                return;
-            }
+            var deceleration = Deceleration * DeltaTime;
+            var newMagnitude = Mathf.Clamp(Velocity.magnitude - deceleration, 0, Velocity.magnitude);
+            Velocity = Velocity.normalized * newMagnitude;
+        }
 
-            // else, instruct the animator to match the movement, and reset the movement application
+        private void ApplyAcceleration() {
             var maxVelocity = MovementRun ? 2.0f : 1.0f;
+            var initialMagnitude = Velocity.magnitude;
 
-            Velocity = Velocity > maxVelocity
-                ? Mathf.Clamp(Velocity - Deceleration * DeltaTime, 0, Velocity)
-                : Mathf.Clamp(Velocity + Acceleration * DeltaTime, 0, maxVelocity);
+            var acceleration = Acceleration * DeltaTime;
+            var accelerationDirection = (MovementApplication - Velocity).normalized;
+            var newVelocity = Velocity + accelerationDirection * acceleration;
 
-            // the velocity defines the magnitude of the movement
-            var movement = MovementApplication * Velocity;
-            SetAnimatorMovementSpeed(movement.x, movement.y);
+            // if the initial magnitude is faster than max velocity, don't allow it to increase
+            // if it is slower, don't allow it to go past max velocity
+            var maxMagnitude = initialMagnitude > maxVelocity ? initialMagnitude : maxVelocity;
+            newVelocity = Vector2.ClampMagnitude(newVelocity, maxMagnitude);
 
+            Velocity = newVelocity;
+
+            // reset movement application - if no new movement is applied, we'll decelerate
             MovementApplication = Vector2.zero;
         }
 
+        public void UpdateMovement() {
+            Animator.SetFloat(AnimatorHash.MovementTickSpeed, MovementSpeedFactor * TickSpeed);
+
+            // no movement, just decelerate
+            if (MovementApplication == Vector2.zero)
+                ApplyDeceleration();
+            else
+                ApplyAcceleration();
+
+            // instruct the animator to match this velocity
+            SetAnimatorMovementSpeed(Velocity.x, Velocity.y);
+        }
+
         public void StopMoving() {
-            Velocity = 0;
-            SetAnimatorMovementSpeed(0, 0);
+            Velocity = Vector2.zero;
         }
 
         private void SetAnimatorMovementSpeed(float forward, float side) {

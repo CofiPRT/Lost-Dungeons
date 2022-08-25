@@ -7,7 +7,7 @@ namespace Camera {
         private const double DistanceEqualsTolerance = 10e-3;
 
         // singleton
-        private static CameraController Instance { get; set; }
+        public static CameraController Instance { get; private set; }
 
         private void Awake() {
             if (Instance != null && Instance != this)
@@ -44,17 +44,12 @@ namespace Camera {
             usedCamera = GetComponent<UnityEngine.Camera>();
         }
 
-        private void LateUpdate() {
-            PerformRotation();
-            PerformCollision();
-        }
-
-        private void PerformRotation() {
+        public void ApplyInput(float horizontal, float vertical) {
             if (!canRotate)
                 return;
 
-            rotation.x += horizontalSensitivity * InputController.HorizontalLook();
-            rotation.y += verticalSensitivity * InputController.VerticalLook() * (invertY ? 1 : -1);
+            rotation.x += horizontalSensitivity * horizontal;
+            rotation.y += verticalSensitivity * vertical * (invertY ? 1 : -1);
 
             // keep in bounds
             rotation.x = Mathf.Repeat(rotation.x, 360);
@@ -64,6 +59,8 @@ namespace Camera {
 
             // smooth lerping
             transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, smoothSpeed * Time.deltaTime);
+
+            PerformCollision();
         }
 
         private void PerformCollision() {

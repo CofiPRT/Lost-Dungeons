@@ -9,6 +9,7 @@ namespace Character {
         private const int DefaultMaxFightingEnemies = 3;
 
         public GenericCharacter Owner { get; }
+        public GenericCharacter LastFoughtEnemy { get; set; }
 
         private readonly int maxFightingEnemies;
         private readonly HashSet<GenericCharacter> fightingEnemies = new HashSet<GenericCharacter>();
@@ -32,6 +33,9 @@ namespace Character {
         public void Unsubscribe(GenericCharacter enemy) {
             fightingEnemies.Remove(enemy);
             waitingEnemies.Remove(enemy);
+            
+            if (LastFoughtEnemy == enemy)
+                LastFoughtEnemy = null;
         }
 
         public void ForceSubscribe(GenericCharacter enemy) {

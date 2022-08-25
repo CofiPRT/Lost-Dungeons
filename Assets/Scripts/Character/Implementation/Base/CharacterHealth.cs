@@ -15,6 +15,9 @@ namespace Character.Implementation.Base {
             Health = Math.Max(0, Health - damage);
 
             var damageDealt = prevHealth - Health;
+            
+            if (damageDealt > 0)
+                OnDamageTaken(damageDealt, source);
 
             // nothing extra to do if the character is still alive
             if (IsAlive) return damageDealt;
@@ -28,6 +31,10 @@ namespace Character.Implementation.Base {
             return damageDealt;
         }
 
+        public virtual void OnDamageTaken(float damageTaken, GenericCharacter source) {
+            // intentionally left blank
+        }
+
         public void Heal(float healAmount) {
             if (!IsAlive)
                 return;
@@ -35,7 +42,7 @@ namespace Character.Implementation.Base {
             Health = Math.Min(MaxHealth, Health + healAmount);
         }
 
-        public void OnDeath() {
+        public virtual void OnDeath() {
             EndAttack();
             EndStun();
             StopMoving();

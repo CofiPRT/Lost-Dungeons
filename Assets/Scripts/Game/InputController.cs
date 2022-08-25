@@ -41,5 +41,7 @@ namespace Game {
         public static bool ChangePlayerPressed() {
             return Input.GetKey("space");
         }
+
+        private void Update() { }
     }
 }

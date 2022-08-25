@@ -24,8 +24,8 @@ namespace Character.Abilities {
         }
 
         public bool Use() {
-            // if on cooldown, don't start
-            if (currentCooldown > 0)
+            // if on cooldown, or another ability blocks this cast, don't start
+            if (currentCooldown > 0 || user.CastBlocksAbilityUsage)
                 return false;
 
             // if already active, offer a reactivation to the current phase
