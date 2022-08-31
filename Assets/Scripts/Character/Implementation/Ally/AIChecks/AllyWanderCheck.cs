@@ -21,7 +21,7 @@ namespace Character.Implementation.Ally.AIChecks {
             var randomAngle = Random.Range(0, Mathf.PI * 2);
             var randomDistance = Random.Range(3, 5);
 
-            var destination = instance.Pos2D + new Vector2(
+            var destination = instance.Leader.Pos2D + new Vector2(
                 randomDistance * Mathf.Cos(randomAngle),
                 randomDistance * Mathf.Sin(randomAngle)
             );

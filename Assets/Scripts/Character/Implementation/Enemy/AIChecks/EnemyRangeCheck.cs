@@ -20,9 +20,9 @@ namespace Character.Implementation.Enemy.AIChecks {
             var opponentPos = instance.FairFight.Owner.Pos2D;
             var ownPos = instance.Pos2D;
 
-            var direction = (opponentPos - ownPos).normalized;
+            var direction = (ownPos - opponentPos).normalized;
             var desiredAngle = Mathf.Atan2(direction.y, direction.x);
-            var angleDeviation = instance.FairFight.IsFighting(instance) ? 0f : Mathf.PI / 4;
+            var angleDeviation = instance.FairFight.IsFighting(instance) ? 0f : Mathf.PI / 6;
             var deviatedAngle = desiredAngle + Random.Range(-angleDeviation, angleDeviation);
 
             var destination = opponentPos + new Vector2(
@@ -32,13 +32,7 @@ namespace Character.Implementation.Enemy.AIChecks {
 
             var run = Vector2.Distance(ownPos, opponentPos) > 5.5f;
 
-            instance.AIAction = new AIMoveAction(
-                instance,
-                destination,
-                run,
-                false,
-                false
-            );
+            instance.AIAction = new AIMoveAction(instance, destination, run, false);
         }
     }
 }

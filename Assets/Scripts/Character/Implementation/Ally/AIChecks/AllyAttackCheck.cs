@@ -1,5 +1,6 @@
 ﻿using Character.Implementation.Base;
 using Character.Implementation.Base.AIActions;
+using UnityEngine;
 
 namespace Character.Implementation.Ally.AIChecks {
     public class AllyAttackCheck : GenericCharacter.BaseAICheck {
@@ -13,14 +14,7 @@ namespace Character.Implementation.Ally.AIChecks {
             if (!instance.FairFight.InFight)
                 return; // not in a fight
 
-            var destination = instance.FairFight.GetRandomFightingEnemy().Pos2D;
-
-            instance.AIAction = new AIMoveAction(
-                instance,
-                destination,
-                true,
-                true
-            );
+            instance.AIAction = new AIAttackAction(instance, instance.FairFight.GetRandomFightingEnemy());
         }
     }
 }

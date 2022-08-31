@@ -2,13 +2,13 @@
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter : MonoBehaviour {
-        private const float DefaultAcceleration = 1.0f;
-        private const float DefaultDeceleration = 0.5f;
-        private static readonly Vector2 DefaultLookDirection = Vector2.up;
+        private const float DefaultAcceleration = 3.0f;
+        private const float DefaultDeceleration = 1.0f;
         private const float DefaultRotationSpeed = 5.0f;
         private const float DefaultDecayTime = 10; // after this many seconds, the character will be destroyed
 
         protected GenericCharacter(CharacterBuilder data) {
+            Name = data.name;
             Team = data.team;
 
             Health = data.maxHealth;
@@ -16,13 +16,13 @@ namespace Character.Implementation.Base {
 
             Acceleration = DefaultAcceleration;
             Deceleration = DefaultDeceleration;
-            LookDirection = DefaultLookDirection;
             RotationSpeed = DefaultRotationSpeed;
 
             AttackDamage = data.attackDamage;
             AttackSpeed = data.attackSpeed;
             AttackRange = data.attackRange;
             AttackAngle = data.attackAngle;
+            AttackStrength = data.attackStrength;
 
             ShieldAngle = data.shieldAngle;
             ShieldRechargeTime = data.shieldRechargeTime;
@@ -44,6 +44,7 @@ namespace Character.Implementation.Base {
         protected virtual void Awake() {
             Animator = GetComponent<Animator>();
             RigidBody = GetComponent<Rigidbody>();
+            Collider = GetComponent<Collider>();
         }
 
         protected delegate void UpdateDelegate();
@@ -51,15 +52,21 @@ namespace Character.Implementation.Base {
         protected virtual UpdateDelegate UpdateActions => delegate {
             UpdateDeathTime();
             UpdateStunDuration();
+            UpdateAI();
+            UpdateBlock();
+        };
+
+        protected UpdateDelegate FixedUpdateActions => delegate {
             UpdateMovement();
             UpdateLookDirection();
-            UpdateAI();
-            UpdateAttackCooldown();
-            UpdateShieldCooldown();
         };
 
         protected virtual void Update() {
             UpdateActions();
+        }
+
+        protected void FixedUpdate() {
+            FixedUpdateActions();
         }
     }
 }

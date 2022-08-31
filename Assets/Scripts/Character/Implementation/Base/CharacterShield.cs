@@ -12,15 +12,15 @@ namespace Character.Implementation.Base {
 
         public float AttemptBlock(float damage, AttackStrength attackStrength, GenericCharacter source) {
             if (!IsBlocking || IsStunned)
-                return damage;
+                return TakeDamage(damage, source);
 
             // if the attack is not within shield angle, block is not successful
             var attackDirection = source.Pos2D - Pos2D;
             var blockDirection = Forward2D;
 
-            var angle = Vector2.Angle(attackDirection, blockDirection);
+            var angle = Vector2.Angle(attackDirection, blockDirection) * Mathf.Deg2Rad;
             if (angle > ShieldAngle)
-                return damage;
+                return TakeDamage(damage, source);
 
             // compute how strong the attack is compared to the blocking power
             var attackScore = AttackScore.Of(attackStrength);
@@ -61,15 +61,14 @@ namespace Character.Implementation.Base {
             return 0;
         }
 
-        public bool CanStartBlocking => IsAlive && !IsBlocking && !IsStunned && !IsAttacking && ShieldCooldown == 0;
+        public bool CanStartBlocking => IsAlive && !IsStunned && !IsAttacking && ShieldCooldown == 0;
 
         public void StartBlocking(Vector2 direction) {
             if (!CanStartBlocking || direction.magnitude == 0) return;
 
-            IsBlocking = true;
+            // start blocking towards this direction - changing the look direction by other means should be prevented
             LookDirection = direction;
-            StopMoving();
-
+            IsBlocking = true;
             Animator.SetBool(AnimatorHash.Blocking, true);
         }
 
@@ -84,7 +83,8 @@ namespace Character.Implementation.Base {
             Animator.SetBool(AnimatorHash.Blocking, false);
         }
 
-        public void UpdateShieldCooldown() {
+        public void UpdateBlock() {
+            // update cooldown
             ShieldCooldown = Mathf.Max(0, ShieldCooldown - DeltaTime);
         }
     }

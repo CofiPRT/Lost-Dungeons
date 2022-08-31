@@ -15,7 +15,7 @@ namespace Character.Implementation.Base {
             Health = Math.Max(0, Health - damage);
 
             var damageDealt = prevHealth - Health;
-            
+
             if (damageDealt > 0)
                 OnDamageTaken(damageDealt, source);
 
@@ -32,7 +32,11 @@ namespace Character.Implementation.Base {
         }
 
         public virtual void OnDamageTaken(float damageTaken, GenericCharacter source) {
-            // intentionally left blank
+            Animator.SetBool(AnimatorHash.Hurt, true);
+        }
+
+        public void StopHurtAnimation() {
+            Animator.SetBool(AnimatorHash.Hurt, false);
         }
 
         public void Heal(float healAmount) {
@@ -48,6 +52,7 @@ namespace Character.Implementation.Base {
             StopMoving();
             StopBlocking();
             SetAI(false);
+
             Animator.SetBool(AnimatorHash.Dead, true);
         }
 
@@ -58,7 +63,7 @@ namespace Character.Implementation.Base {
             DeathTime += DeltaTime;
 
             if (DeathTime > DefaultDecayTime)
-                Destroy(this);
+                Destroy(gameObject);
         }
     }
 }

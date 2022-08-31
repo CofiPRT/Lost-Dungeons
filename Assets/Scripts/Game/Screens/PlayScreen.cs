@@ -1,6 +1,5 @@
 ﻿using Camera;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace Game.Screens {
     public class PlayScreen : GameScreen {
@@ -11,34 +10,46 @@ namespace Game.Screens {
             CameraController.Instance.ApplyInput(horizontalMovement, verticalMovement);
         }
 
+        private bool prevPressedP;
+
         public override void Update() {
             // handle player movement
             var direction = Vector2.zero;
 
-            if (Input.GetKey(KeyCode.W)) direction.y += 1;
+            if (Input.GetKey(KeyCode.W)) direction += CameraController.Forward2D;
 
-            if (Input.GetKey(KeyCode.S)) direction.y -= 1;
+            if (Input.GetKey(KeyCode.S)) direction -= CameraController.Forward2D;
 
-            if (Input.GetKey(KeyCode.D)) direction.x += 1;
+            if (Input.GetKey(KeyCode.D)) direction += CameraController.Right2D;
 
-            if (Input.GetKey(KeyCode.A)) direction.x -= 1;
+            if (Input.GetKey(KeyCode.A)) direction -= CameraController.Right2D;
 
             var running = Input.GetKey(KeyCode.LeftShift);
 
             if (direction.magnitude > 0)
-                GameController.ControllerPlayer.ApplyMovement(direction.normalized, running, false);
-            
+                GameController.ControlledPlayer.ApplyMovement(
+                    direction.normalized,
+                    running,
+                    true
+                );
+
             // handle player attack
             if (Input.GetKey(KeyCode.Mouse0)) {
-                var attackDirection = direction.magnitude > 0 ? direction : CameraController.Forward2D;
-                GameController.ControllerPlayer.StartAttack(attackDirection);
+                var attackDirection = direction.magnitude > 0 ? direction : GameController.ControlledPlayer.Forward2D;
+                GameController.ControlledPlayer.StartAttack(attackDirection);
             }
-            
+
             // handle player block
-            if (Input.GetKey(KeyCode.Mouse1)) {
-                var blockDirection = direction.magnitude > 0 ? direction : CameraController.Forward2D;
-                GameController.ControllerPlayer.StartBlocking(blockDirection);
-            }
+            if (Input.GetKey(KeyCode.Mouse1))
+                GameController.ControlledPlayer.StartBlocking(CameraController.Forward2D);
+            else
+                GameController.ControlledPlayer.StopBlocking();
+
+            // handle debug spawning
+            if (Input.GetKeyDown(KeyCode.P) && !prevPressedP)
+                GameController.SpawnDebugEnemy();
+
+            prevPressedP = Input.GetKey(KeyCode.P);
         }
     }
 }

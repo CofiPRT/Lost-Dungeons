@@ -11,12 +11,12 @@ namespace Character.Implementation.Ally.AIChecks {
         }
 
         protected override void Perform() {
-            if (!instance.FairFight.InFight)
+            if (instance.FairFight.InFight)
                 return; // only follow when not in a fight
 
             var distToLeader = Vector2.Distance(instance.Leader.Pos2D, instance.Pos2D);
-            if (distToLeader < 5)
-                return; // this should be handled by AllyRangeCheck
+            if (distToLeader < 7.5)
+                return; // this should be handled by AllyWanderCheck
 
             var deviatedRange = Random.Range(2.5f, 5f);
 
@@ -32,10 +32,7 @@ namespace Character.Implementation.Ally.AIChecks {
                 deviatedRange * Mathf.Sin(deviatedAngle)
             );
 
-            instance.AIAction = new AIMoveAction(
-                instance,
-                destination
-            );
+            instance.AIAction = new AIMoveAction(instance, destination);
         }
     }
 }

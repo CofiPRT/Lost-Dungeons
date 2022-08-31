@@ -37,11 +37,17 @@ namespace Character.Implementation.Enemy {
 
         /* Parent */
 
-        public override Vector2 LookDirection => FairFight != null ? FairFight.Owner.Pos2D - Pos2D : Forward2D;
-        
         public override void OnDeath() {
             base.OnDeath();
             FairFight?.Unsubscribe(this);
+        }
+
+        public override void UpdateLookDirection() {
+            // override the look direction if instructed
+            if (FairFight != null)
+                LookDirection = FairFight.Owner.Pos2D - Pos2D;
+
+            base.UpdateLookDirection();
         }
     }
 }

@@ -1,28 +1,31 @@
 ﻿using UnityEngine;
 
 namespace Character.Implementation.Base.AIActions {
-    public class AIMoveAction : GenericCharacter.BaseAIAction {
-        private readonly Vector2 destination;
+    public class AIAttackAction : GenericCharacter.BaseAIAction {
+        private readonly GenericCharacter target;
         private readonly bool run;
         private readonly bool syncLookDirection;
 
-        public AIMoveAction(
+        public AIAttackAction(
             GenericCharacter instance,
-            Vector2 destination,
+            GenericCharacter target,
             bool run = true,
             bool syncLookDirection = true,
             float maxDuration = 5
         ) : base(instance, maxDuration) {
-            this.destination = destination;
+            this.target = target;
             this.run = run;
             this.syncLookDirection = syncLookDirection;
         }
 
         protected override void OnUpdate() {
             var ownPos = instance.Pos2D;
-            var direction = (destination - ownPos).normalized;
+            var targetPos = target.Pos2D;
 
-            if (Vector2.Distance(ownPos, destination) < 0.5f) {
+            var direction = (targetPos - ownPos).normalized;
+
+            if (Vector2.Distance(ownPos, targetPos) < instance.AttackRange * 0.75) {
+                instance.StartAttack(direction);
                 OnEnd();
                 return; // reached destination
             }

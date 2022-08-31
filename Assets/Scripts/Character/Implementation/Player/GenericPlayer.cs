@@ -6,8 +6,15 @@ using Character.Implementation.Base;
 
 namespace Character.Implementation.Player {
     public abstract class GenericPlayer : GenericAlly {
-        protected GenericPlayer(CharacterBuilder data) : base(data) {
+        protected GenericPlayer(string name) : base(CreateData(name)) {
             AbilityDodge = new DodgeAbility(this);
+        }
+
+        private static CharacterBuilder CreateData(string name) {
+            return new CharacterBuilder {
+                name = name,
+                team = Properties.Team.Player
+            };
         }
 
         /* Shared Abilities */
@@ -28,7 +35,7 @@ namespace Character.Implementation.Player {
         public bool CastBlocksMovement { get; set; }
 
         public IEnumerable<Ability> Abilities => new[]
-            { AbilityDodge, AbilitySwitch, AbilityTagTeam, Ability1, Ability2, Ultimate };
+            { AbilityDodge /*, AbilitySwitch, AbilityTagTeam, Ability1, Ability2, Ultimate*/ };
 
         public void UpdateAbilities() {
             if (!IsAlive)

@@ -1,14 +1,11 @@
 fileFormatVersion: 2
-guid: 63f90be3dc07eb54487d13c66ba559b4
+guid: 4295a09b0d5b7bd4a8bfa03de0d3b7b3
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable:
   - first:
       74: -203655887218126122
     second: Dodge Right
-  - first:
-      74: -203655887218126122
-    second: mixamo.com
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -56,7 +53,7 @@ ModelImporter:
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 0
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 1
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
@@ -276,12 +273,12 @@ ModelImporter:
     - name: Dodge Right(Clone)
       parentName: 
       position: {x: 0, y: 0, z: 0}
-      rotation: {x: -0.025844587, y: -0.51457727, z: 0.032993823, w: 0.85641915}
+      rotation: {x: -0.05627475, y: -0.53573114, z: 0.10765185, w: 0.83560544}
       scale: {x: 1, y: 1, z: 1}
     - name: Bip001
       parentName: Dodge Right(Clone)
-      position: {x: -0.015301186, y: 0.6415119, z: -0.007892978}
-      rotation: {x: -0.1412995, y: 0.68901384, z: 0.6819656, w: 0.20054257}
+      position: {x: 0.19589555, y: 0.592182, z: 0.005997016}
+      rotation: {x: -0.06777802, y: 0.71128845, z: 0.66000015, w: 0.23210946}
       scale: {x: 1, y: 1, z: 1}
     - name: Bip001 Footsteps
       parentName: Bip001
@@ -290,7 +287,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: Bip001 Pelvis
       parentName: Bip001
-      position: {x: 0.00007001683, y: -0.019385278, z: 0.118700214}
+      position: {x: 0.00007964112, y: -0.000000014901161, z: 0.13497232}
       rotation: {x: 0.5, y: -0.5, z: -0.5, w: -0.5}
       scale: {x: 1, y: 1, z: 1}
     - name: Bip001 Spine

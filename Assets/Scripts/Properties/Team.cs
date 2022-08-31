@@ -23,5 +23,7 @@
                 _ => throw new System.Exception($"Unknown membership: {membership}")
             };
         }
+
+        public static readonly string[] AllLayers = { "Player", "Ally", "Enemy" };
     }
 }

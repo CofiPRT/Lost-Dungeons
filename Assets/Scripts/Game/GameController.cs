@@ -1,12 +1,11 @@
+using Character.Implementation.Enemy;
 using Character.Implementation.Player;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
 namespace Game {
     public class GameController : MonoBehaviour {
         // singleton
-        public static GameController Instance { get; private set; }
+        private static GameController Instance { get; set; }
 
         private void Awake() {
             if (Instance != null && Instance != this)
@@ -15,22 +14,26 @@ namespace Game {
                 Instance = this;
         }
 
+        /* default instances - to be set in inspector */
+        public GenericPlayer defaultPlayer1;
+        public GenericPlayer defaultPlayer2;
+
+        public GenericEnemy defaultEnemyWhite;
+
         /* game data */
 
         private GenericPlayer controllerPlayer;
+        private GenericPlayer player1;
+        private GenericPlayer player2;
 
-        // public to allow the Unity inspector to set it
-        public GenericPlayer player1;
-        public GenericPlayer player2;
-
-        private float gameTickSpeed;
-        private float playerTickFactor;
+        private float gameTickSpeed = 1;
+        private float playerTickFactor = 1;
 
         /* static properties */
 
         public static GenericPlayer Player1 => Instance.player1;
         public static GenericPlayer Player2 => Instance.player2;
-        public static GenericPlayer ControllerPlayer => Instance.controllerPlayer;
+        public static GenericPlayer ControlledPlayer => Instance.controllerPlayer;
 
         public static float GameTickSpeed {
             get => Instance.gameTickSpeed;
@@ -44,10 +47,19 @@ namespace Game {
 
 
         private void Start() {
-            player1 = Instantiate(player1, new Vector3(0, 1, 0), Quaternion.identity);
-            player2 = Instantiate(player2, new Vector3(1, 0, 0), Quaternion.identity);
+            player1 = Instantiate(defaultPlayer1, new Vector3(0, 1, 0), Quaternion.identity);
+            player2 = Instantiate(defaultPlayer2, new Vector3(1, 0, 0), Quaternion.identity);
 
             controllerPlayer = player1;
+            controllerPlayer.SetAI(false);
+        }
+
+        public static void SpawnDebugEnemy() {
+            Instantiate(
+                Instance.defaultEnemyWhite,
+                ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
+                Quaternion.identity
+            );
         }
     }
 }

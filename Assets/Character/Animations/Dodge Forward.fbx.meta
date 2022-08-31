@@ -1,14 +1,11 @@
 fileFormatVersion: 2
-guid: 6cb91f380b6137f4eb2ee97d32f2bd51
+guid: 53a4c80b01d8ca8448541c1e0eec35ba
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable:
   - first:
       74: -203655887218126122
     second: Dodge Forward
-  - first:
-      74: -203655887218126122
-    second: mixamo.com
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -42,7 +39,7 @@ ModelImporter:
       takeName: mixamo.com
       internalID: 0
       firstFrame: 0
-      lastFrame: 59
+      lastFrame: 58
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -56,7 +53,7 @@ ModelImporter:
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 0
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 1
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
@@ -276,12 +273,12 @@ ModelImporter:
     - name: Dodge Forward(Clone)
       parentName: 
       position: {x: 0, y: 0, z: 0}
-      rotation: {x: -0.025844585, y: -0.5145784, z: 0.03299357, w: 0.8564185}
+      rotation: {x: -0.12602349, y: -0.58671206, z: 0.020460699, w: 0.7996677}
       scale: {x: 1, y: 1, z: 1}
     - name: Bip001
       parentName: Dodge Forward(Clone)
-      position: {x: -0.0153014595, y: 0.6415109, z: -0.0078928955}
-      rotation: {x: -0.14129871, y: 0.68901396, z: 0.681966, w: 0.20054157}
+      position: {x: -0.009493635, y: 0.6110812, z: 0.1471583}
+      rotation: {x: -0.03301462, y: 0.64035547, z: 0.7459814, w: 0.17990787}
       scale: {x: 1, y: 1, z: 1}
     - name: Bip001 Footsteps
       parentName: Bip001
@@ -290,7 +287,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: Bip001 Pelvis
       parentName: Bip001
-      position: {x: 0.000070026144, y: -0.019385085, z: 0.11870128}
+      position: {x: 0.00008305162, y: -0.071425155, z: 0.14103363}
       rotation: {x: 0.5, y: -0.5, z: -0.5, w: -0.5}
       scale: {x: 1, y: 1, z: 1}
     - name: Bip001 Spine

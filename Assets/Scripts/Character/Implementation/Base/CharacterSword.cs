@@ -7,32 +7,35 @@ using Random = UnityEngine.Random;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        public bool IsAttacking { get; set; }
-        public bool IsPreparingToAttack { get; set; }
-        public float AttackDamage { get; }
-        public float AttackSpeed { get; }
-        public float AttackCooldown { get; set; }
-        public float AttackRange { get; }
-        public float AttackAngle { get; }
+        protected bool IsAttacking { get; set; }
+        public bool IsPreparingToAttack { get; private set; }
+        private bool AttackBlocksMovement { get; set; }
 
-        public IEnumerable<Team> AttackableTeams => Team switch {
+        private float AttackDamage { get; }
+        private float AttackSpeed { get; }
+        internal float AttackRange { get; }
+        private float AttackAngle { get; }
+        private AttackStrength AttackStrength { get; }
+
+        private float LastAttackTimestamp { get; set; }
+        private int AttackStreak { get; set; }
+
+        protected internal IEnumerable<Team> AttackableTeams => Team switch {
             Team.Player => new[] { Team.Enemy },
             Team.Ally => new[] { Team.Enemy },
             Team.Enemy => new[] { Team.Player, Team.Ally },
             _ => Array.Empty<Team>()
         };
 
-        public void AttemptAttack(float damageMultiplier, AttackStrength attackStrength) {
+        public void AttemptAttack() {
             if (!IsAttacking) return;
 
             IsPreparingToAttack = false;
-
-            var damage = (int)(AttackDamage * damageMultiplier);
             var opponents = GetOpponentsInAttackArea();
 
             foreach (var opponent in opponents) {
                 // delegate the attack to the shield wielder
-                var damageDealt = opponent.AttemptBlock(damage, attackStrength, this);
+                var damageDealt = opponent.AttemptBlock(AttackDamage, AttackStrength, this);
 
                 // notify self
                 if (damageDealt > 0)
@@ -52,7 +55,7 @@ namespace Character.Implementation.Base {
                 .ToList();
         }
 
-        public IEnumerable<GenericCharacter> GetOpponentsInAttackArea() {
+        private IEnumerable<GenericCharacter> GetOpponentsInAttackArea() {
             // check for attack-able objects in the attack range - first obtain a sphere overlap
             var opponents = GetOpponentsInAttackRange();
 
@@ -71,44 +74,66 @@ namespace Character.Implementation.Base {
             if (distance > AttackRange) return false;
 
             // the angle must be within the sector
-            var angle = Vector2.Angle(Forward2D, opponentPos - Pos2D);
+            var angle = Vector2.Angle(Forward2D, opponentPos - Pos2D) * Mathf.Deg2Rad;
             return angle <= AttackAngle;
         }
 
-        public virtual void OnAttackSuccess(GenericCharacter target, float damageDealt) {
+        protected virtual void OnAttackSuccess(GenericCharacter target, float damageDealt) {
             // intentionally left blank
         }
 
-        public bool CanStartAttack => IsAlive && !IsAttacking && !IsStunned && AttackCooldown == 0;
+        private bool CanStartAttack => IsAlive && !IsAttacking && !IsStunned;
 
         public void StartAttack(Vector2 direction) {
             if (!CanStartAttack) return;
 
             IsAttacking = true;
             IsPreparingToAttack = true;
-            AttackCooldown = 1 / AttackSpeed;
             LookDirection = direction;
 
             // attacking can override blocking
             StopBlocking();
 
-            // random attack animation out of two available
-            Animator.SetInteger(AnimatorHash.Attacking, Random.Range(1, 3));
+            // random attack animation
+            Animator.SetInteger(AnimatorHash.AttackID, GetAttackID());
             Animator.SetFloat(AnimatorHash.AttackTickSpeed, AttackSpeed * TickSpeed);
         }
 
-        public void EndAttack() {
+        private int GetAttackID() {
+            var attackDelay = Time.time - LastAttackTimestamp;
+            var acceptableDelay = 1 / AttackSpeed * TickSpeed;
+
+            // reset attack streak
+            if (attackDelay > acceptableDelay)
+                AttackStreak = 0;
+
+            // finisher animation, reset streak
+            if (AttackStreak >= 3) {
+                AttackStreak = 0;
+                AttackBlocksMovement = true;
+                return Random.Range(5, 7 + 1);
+            }
+
+            // combo animation, continue streak
+            if (AttackStreak >= 2) {
+                AttackStreak++;
+                AttackBlocksMovement = true;
+                return Random.Range(3, 4 + 1);
+            }
+
+            // normal animation, continue streak
+            AttackStreak++;
+            return Random.Range(1, 2 + 1);
+        }
+
+        private void EndAttack() {
             if (!IsAttacking) return;
 
             IsAttacking = false;
-            Animator.SetInteger(AnimatorHash.Attacking, 0);
-        }
-
-        public void UpdateAttackCooldown() {
-            if (!IsAlive)
-                return;
-
-            AttackCooldown = Mathf.Max(0, AttackCooldown - DeltaTime);
+            IsPreparingToAttack = false;
+            AttackBlocksMovement = false;
+            Animator.SetInteger(AnimatorHash.AttackID, 0);
+            LastAttackTimestamp = Time.time;
         }
     }
 }

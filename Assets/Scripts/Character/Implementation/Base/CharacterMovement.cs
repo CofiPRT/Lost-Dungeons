@@ -1,58 +1,65 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
         public Rigidbody RigidBody { get; set; }
-        public virtual Vector2 LookDirection { get; set; }
+        public Collider Collider { get; set; }
+        public Vector2 LookDirection { get; set; }
         public Vector2 MovementApplication { get; set; }
-        public bool MovementRun { get; set; }
+        public bool IsRunning { get; set; }
         public Vector2 Velocity { get; set; }
         public float Acceleration { get; }
         public float Deceleration { get; }
         public float RotationSpeed { get; }
         public float MovementSpeedFactor => 1;
-        public virtual bool CanApplyMovement => IsAlive && !IsStunned;
+        public virtual bool CanApplyMovement => IsAlive && !IsStunned && !AttackBlocksMovement;
 
         public void ApplyMovement(Vector2 direction, bool run, bool syncLookDirection) {
             if (!CanApplyMovement || direction.magnitude == 0)
-                StopMoving();
+                return;
 
-            if (syncLookDirection)
+            if ((run || syncLookDirection) && !IsBlocking)
                 LookDirection = direction;
 
-            // compute the signed angle difference between the movement direction and the look direction
-            var angleDiff = Vector2.SignedAngle(LookDirection, direction);
+            // compute the signed angle difference between the movement direction and the character's orientation
+            var angleDiff = Vector2.SignedAngle(Forward2D, direction) * Mathf.Deg2Rad;
 
             // the animator will be instructed to move according to this relative direction
-            var relativeMovementDirection = new Vector2(Mathf.Cos(angleDiff), -Mathf.Sin(angleDiff));
+            var relativeMovementDirection = new Vector2(-Mathf.Sin(angleDiff), Mathf.Cos(angleDiff));
 
-            MovementApplication = relativeMovementDirection;
-            MovementRun = run;
+            MovementApplication = relativeMovementDirection * (run ? 2 : 1);
+            IsRunning = run;
         }
 
         private void ApplyDeceleration() {
             if (Velocity.magnitude == 0)
                 return; // no deceleration if we're not moving
 
-            var deceleration = Deceleration * DeltaTime;
+            var deceleration = Deceleration * FixedDeltaTime;
             var newMagnitude = Mathf.Clamp(Velocity.magnitude - deceleration, 0, Velocity.magnitude);
             Velocity = Velocity.normalized * newMagnitude;
         }
 
         private void ApplyAcceleration() {
-            var maxVelocity = MovementRun ? 2.0f : 1.0f;
+            if (MovementApplication.magnitude == 0)
+                return; // no acceleration if we're not moving
+
+            var maxVelocity = MovementApplication.magnitude;
             var initialMagnitude = Velocity.magnitude;
 
-            var acceleration = Acceleration * DeltaTime;
+            // don't overshoot the acceleration vector, otherwise a terrible jitter may happen
             var accelerationDirection = (MovementApplication - Velocity).normalized;
+            var acceleration = Mathf.Min(
+                Acceleration * FixedDeltaTime,
+                Vector2.Distance(Velocity, MovementApplication)
+            );
+
             var newVelocity = Velocity + accelerationDirection * acceleration;
 
             // if the initial magnitude is faster than max velocity, don't allow it to increase
             // if it is slower, don't allow it to go past max velocity
-            var maxMagnitude = initialMagnitude > maxVelocity ? initialMagnitude : maxVelocity;
-            newVelocity = Vector2.ClampMagnitude(newVelocity, maxMagnitude);
-
-            Velocity = newVelocity;
+            Velocity = Vector2.ClampMagnitude(newVelocity, Mathf.Max(initialMagnitude, maxVelocity));
 
             // reset movement application - if no new movement is applied, we'll decelerate
             MovementApplication = Vector2.zero;
@@ -61,40 +68,46 @@ namespace Character.Implementation.Base {
         public void UpdateMovement() {
             Animator.SetFloat(AnimatorHash.MovementTickSpeed, MovementSpeedFactor * TickSpeed);
 
-            // no movement, just decelerate
-            if (MovementApplication == Vector2.zero)
-                ApplyDeceleration();
-            else
-                ApplyAcceleration();
+            ApplyDeceleration();
+            ApplyAcceleration();
 
             // instruct the animator to match this velocity
-            SetAnimatorMovementSpeed(Velocity.x, Velocity.y);
+            Animator.SetFloat(AnimatorHash.ForwardSpeed, Velocity.y);
+            Animator.SetFloat(AnimatorHash.SideSpeed, Velocity.x);
+            Animator.SetFloat(AnimatorHash.SpeedMagnitude, Velocity.magnitude);
         }
 
         public void StopMoving() {
             Velocity = Vector2.zero;
         }
 
-        private void SetAnimatorMovementSpeed(float forward, float side) {
-            Animator.SetFloat(AnimatorHash.ForwardSpeed, forward);
-            Animator.SetFloat(AnimatorHash.SideSpeed, side);
+        private void OnCollisionEnter(Collision collision) {
+            var charLayers = LayerMask.GetMask(Properties.TeamUtils.AllLayers);
+
+            // ignore collisions with other characters if this one is dead
+            if (!IsAlive && charLayers == (charLayers | (1 << collision.gameObject.layer)))
+                Physics.IgnoreCollision(Collider, collision.collider);
         }
 
-        public void UpdateLookDirection() {
+        public virtual void UpdateLookDirection() {
             if (!IsAlive)
                 return;
 
+            var direction = LookDirection == Vector2.zero ? Forward2D : LookDirection;
+
             // face target direction
             var rotation = Quaternion.LookRotation(
-                Vector3.Normalize(new Vector3(LookDirection.x, 0, LookDirection.y))
+                Vector3.Normalize(new Vector3(direction.x, Forward.y, direction.y))
             );
 
             // smooth lerp
-            var speed = RotationSpeed * DeltaTime;
+            var speed = RotationSpeed * FixedDeltaTime;
             RigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, rotation, speed));
 
             // update the animator
             Animator.SetFloat(AnimatorHash.AnimationTickSpeed, TickSpeed);
+
+            IsRunning = false;
         }
     }
 }

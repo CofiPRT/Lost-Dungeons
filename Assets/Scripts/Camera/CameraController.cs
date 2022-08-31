@@ -19,6 +19,9 @@ namespace Camera {
         public static Vector3 Forward => Instance.transform.forward;
         public static Vector2 Forward2D => new Vector2(Forward.x, Forward.z).normalized;
 
+        public static Vector3 Right => Instance.transform.right;
+        public static Vector2 Right2D => new Vector2(Right.x, Right.z).normalized;
+
         [Range(0.1f, 20.0f)] public float smoothSpeed = 10f; // for lerping
 
         public float heightFromTarget;
@@ -45,8 +48,10 @@ namespace Camera {
         }
 
         public void ApplyInput(float horizontal, float vertical) {
-            if (!canRotate)
+            if (!canRotate) {
+                PerformCollision();
                 return;
+            }
 
             rotation.x += horizontalSensitivity * horizontal;
             rotation.y += verticalSensitivity * vertical * (invertY ? 1 : -1);
@@ -64,7 +69,7 @@ namespace Camera {
         }
 
         private void PerformCollision() {
-            var target = GameController.Instance.player1;
+            var target = GameController.ControlledPlayer;
 
             var targetPos = target.transform.position + target.GetComponent<Rigidbody>().centerOfMass;
             var desiredPosition = targetPos - transform.forward * distanceFromTarget;
