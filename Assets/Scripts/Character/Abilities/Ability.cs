@@ -1,5 +1,4 @@
 ﻿using System;
-using Character.Implementation.Base;
 using Character.Implementation.Player;
 using UnityEngine;
 
@@ -76,6 +75,8 @@ namespace Character.Abilities {
 
             foreach (var phase in phases)
                 phase.Reset();
+
+            finalPhase.Reset();
         }
     }
 }

@@ -6,9 +6,10 @@ namespace Character.Implementation.Base {
         public float DeathTime { get; set; }
         public float Health { get; set; }
         public float MaxHealth { get; }
+        public bool CanTakeDamage { get; set; } = true;
 
         public float TakeDamage(float damage, GenericCharacter source = null) {
-            if (!IsAlive)
+            if (!IsAlive || !CanTakeDamage)
                 return 0;
 
             var prevHealth = Health;
@@ -53,6 +54,7 @@ namespace Character.Implementation.Base {
             StopBlocking();
             SetAI(false);
 
+            IgnoreCollisions = true;
             Animator.SetBool(AnimatorHash.Dead, true);
         }
 
@@ -62,8 +64,10 @@ namespace Character.Implementation.Base {
 
             DeathTime += DeltaTime;
 
-            if (DeathTime > DefaultDecayTime)
-                Destroy(gameObject);
+            if (DeathTime < DefaultDecayTime) return;
+
+            Destroy(gameObject);
+            Destroy(healthBarCanvas.gameObject);
         }
     }
 }

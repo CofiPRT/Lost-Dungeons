@@ -26,7 +26,7 @@ namespace Character.Implementation.Ally.AIChecks {
                     LayerMask.GetMask(instance.AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
                 )
                 .Select(x => x.GetComponent<GenericEnemy>())
-                .Where(x => x != null && x.IsAlive && x.FairFight.IsFighting(x))
+                .Where(x => x != null && x.IsAlive && x.FairFight != null && x.FairFight.IsFighting(x))
                 .ToList();
 
             // choose one enemy at random

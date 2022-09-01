@@ -32,6 +32,8 @@ namespace Character {
             if (IsSubscribed(enemy))
                 return;
 
+            enemy.FairFight = this;
+
             if (MaxFightingEnemiesReached)
                 waitingEnemies.Add(enemy);
             else
@@ -67,6 +69,8 @@ namespace Character {
 
             // subscribe the new enemy
             Subscribe(enemy);
+
+            LastFoughtEnemy = enemy;
         }
 
         public void UnsubscribeAll() {
@@ -103,10 +107,10 @@ namespace Character {
 
         public void Update() {
             // unsubscribe dead enemies
-            foreach (var enemy in fightingEnemies.Where(enemy => !enemy.IsAlive))
+            foreach (var enemy in fightingEnemies.Where(enemy => !enemy.IsAlive).ToArray())
                 Unsubscribe(enemy);
 
-            foreach (var enemy in waitingEnemies.Where(enemy => !enemy.IsAlive))
+            foreach (var enemy in waitingEnemies.Where(enemy => !enemy.IsAlive).ToArray())
                 Unsubscribe(enemy);
 
             if (teamUpEnemy != null && !teamUpEnemy.IsAlive)

@@ -61,7 +61,7 @@ namespace Character.Implementation.Base {
             return 0;
         }
 
-        public bool CanStartBlocking => IsAlive && !IsStunned && !IsAttacking && ShieldCooldown == 0;
+        protected virtual bool CanStartBlocking => IsAlive && !IsStunned && !IsAttacking && ShieldCooldown == 0;
 
         public void StartBlocking(Vector2 direction) {
             if (!CanStartBlocking || direction.magnitude == 0) return;

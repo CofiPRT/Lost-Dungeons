@@ -1,10 +1,7 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        public Rigidbody RigidBody { get; set; }
-        public Collider Collider { get; set; }
         public Vector2 LookDirection { get; set; }
         public Vector2 MovementApplication { get; set; }
         public bool IsRunning { get; set; }
@@ -13,7 +10,7 @@ namespace Character.Implementation.Base {
         public float Deceleration { get; }
         public float RotationSpeed { get; }
         public float MovementSpeedFactor => 1;
-        public virtual bool CanApplyMovement => IsAlive && !IsStunned && !AttackBlocksMovement;
+        protected virtual bool CanApplyMovement => IsAlive && !IsStunned && !AttackBlocksMovement;
 
         public void ApplyMovement(Vector2 direction, bool run, bool syncLookDirection) {
             if (!CanApplyMovement || direction.magnitude == 0)
@@ -23,13 +20,15 @@ namespace Character.Implementation.Base {
                 LookDirection = direction;
 
             // compute the signed angle difference between the movement direction and the character's orientation
-            var angleDiff = Vector2.SignedAngle(Forward2D, direction) * Mathf.Deg2Rad;
-
-            // the animator will be instructed to move according to this relative direction
-            var relativeMovementDirection = new Vector2(-Mathf.Sin(angleDiff), Mathf.Cos(angleDiff));
+            var relativeMovementDirection = RelativizeToForwardDirection(direction);
 
             MovementApplication = relativeMovementDirection * (run ? 2 : 1);
             IsRunning = run;
+        }
+
+        public Vector2 RelativizeToForwardDirection(Vector2 direction) {
+            var angleDiff = Vector2.SignedAngle(Forward2D, direction) * Mathf.Deg2Rad;
+            return new Vector2(-Mathf.Sin(angleDiff), Mathf.Cos(angleDiff));
         }
 
         private void ApplyDeceleration() {
@@ -66,8 +65,6 @@ namespace Character.Implementation.Base {
         }
 
         public void UpdateMovement() {
-            Animator.SetFloat(AnimatorHash.MovementTickSpeed, MovementSpeedFactor * TickSpeed);
-
             ApplyDeceleration();
             ApplyAcceleration();
 
@@ -79,14 +76,6 @@ namespace Character.Implementation.Base {
 
         public void StopMoving() {
             Velocity = Vector2.zero;
-        }
-
-        private void OnCollisionEnter(Collision collision) {
-            var charLayers = LayerMask.GetMask(Properties.TeamUtils.AllLayers);
-
-            // ignore collisions with other characters if this one is dead
-            if (!IsAlive && charLayers == (charLayers | (1 << collision.gameObject.layer)))
-                Physics.IgnoreCollision(Collider, collision.collider);
         }
 
         public virtual void UpdateLookDirection() {
@@ -103,9 +92,6 @@ namespace Character.Implementation.Base {
             // smooth lerp
             var speed = RotationSpeed * FixedDeltaTime;
             RigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, rotation, speed));
-
-            // update the animator
-            Animator.SetFloat(AnimatorHash.AnimationTickSpeed, TickSpeed);
 
             IsRunning = false;
         }

@@ -17,10 +17,12 @@ namespace Character.Implementation.Enemy.AIChecks {
             var opponents = instance.FindOpponents();
             opponents.Sort();
 
-            var opponent = opponents.Where(
+            var validOpponents = opponents.Where(
                     opponent => !opponent.FairFight.MaxFightingEnemiesReached
                 )
-                .FirstOrDefault(null!);
+                .ToList();
+
+            var opponent = validOpponents.Any() ? validOpponents.First() : null;
 
             // if there's no such opponent, there's nothing to do
             if (opponent == null)

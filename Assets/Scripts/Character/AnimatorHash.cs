@@ -19,9 +19,8 @@ namespace Character {
         public static readonly int Dead = Animator.StringToHash("dead");
         public static readonly int Hurt = Animator.StringToHash("hurt");
 
-        public static readonly int DodgingForward = Animator.StringToHash("dodgingForward");
-        public static readonly int DodgingBackward = Animator.StringToHash("dodgingBackward");
-        public static readonly int DodgingLeft = Animator.StringToHash("dodgingLeft");
-        public static readonly int DodgingRight = Animator.StringToHash("dodgingRight");
+        public static readonly int ForwardSpeedDodge = Animator.StringToHash("forwardSpeedDodge");
+        public static readonly int SideSpeedDodge = Animator.StringToHash("sideSpeedDodge");
+        public static readonly int Dodging = Animator.StringToHash("dodging");
     }
 }

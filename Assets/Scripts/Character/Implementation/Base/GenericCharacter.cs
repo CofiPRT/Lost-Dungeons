@@ -42,18 +42,20 @@ namespace Character.Implementation.Base {
         public Vector2 Forward2D => new Vector2(Forward.x, Forward.z).normalized;
 
         protected virtual void Awake() {
-            Animator = GetComponent<Animator>();
-            RigidBody = GetComponent<Rigidbody>();
-            Collider = GetComponent<Collider>();
+            AwakeAnimator();
+            AwakeCollider();
+            AwakeHealthBar();
         }
 
         protected delegate void UpdateDelegate();
 
         protected virtual UpdateDelegate UpdateActions => delegate {
+            UpdateTickSpeeds();
             UpdateDeathTime();
             UpdateStunDuration();
             UpdateAI();
             UpdateBlock();
+            UpdateHealthBar();
         };
 
         protected UpdateDelegate FixedUpdateActions => delegate {

@@ -3,18 +3,15 @@ using Camera;
 using Character.Implementation.Player;
 using Game;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Character.Abilities.Shared {
     public class DodgeAbility : Ability {
         private const float Cooldown = 5f;
 
-        private static readonly Color VignetteColor = Color.white;
-        private const float VignetteIntensity = 0.25f;
-        private const float FilmGrainIntensity = 1.0f;
-        private const float LensDistortionIntensity = -0.5f;
+        private const float GameTickSpeed = 0.1f;
+        private const float PlayerTickFactor = 8.0f;
 
-        private DashDirection dashDirection;
+        private Vector2 dashDirection;
         private bool dodged;
 
         public DodgeAbility(GenericPlayer user) : base(user, Cooldown) {
@@ -26,37 +23,37 @@ namespace Character.Abilities.Shared {
             finalPhase = new FinalPhase(this);
         }
 
-        private int Hash => dashDirection switch {
-            DashDirection.Forward => AnimatorHash.DodgingForward,
-            DashDirection.Backward => AnimatorHash.DodgingBackward,
-            DashDirection.Left => AnimatorHash.DodgingLeft,
-            DashDirection.Right => AnimatorHash.DodgingRight,
-            _ => AnimatorHash.DodgingBackward
-        };
-
-        public void Use(DashDirection direction) {
+        public bool Use(Vector2 direction) {
             if (!base.Use())
-                return;
+                return false;
 
             dashDirection = direction;
             dodged = false;
+
+            return true;
         }
 
         private class Phase1 : AbilityPhase {
             private new readonly DodgeAbility ability;
 
-            public Phase1(DodgeAbility ability) : base(ability, 0.5f, false) {
+            public Phase1(DodgeAbility ability) : base(ability, 0.25f) {
                 this.ability = ability;
             }
 
             protected override void OnStart() {
-                // instantly make the player look towards the direction of the camera
-                ability.user.RigidBody.MoveRotation(Quaternion.LookRotation(CameraController.Forward2D));
+                // compute the dash direction relative to body orientation
+                var relativeDashDirection = ability.user.RelativizeToForwardDirection(ability.dashDirection);
 
                 // run the animation
-                ability.user.Animator.SetBool(ability.Hash, true);
+                ability.user.Animator.SetBool(AnimatorHash.Dodging, true);
+                ability.user.Animator.SetFloat(AnimatorHash.ForwardSpeedDodge, relativeDashDirection.y);
+                ability.user.Animator.SetFloat(AnimatorHash.SideSpeedDodge, relativeDashDirection.x);
+
+                ability.user.CanTakeDamage = false;
+                ability.user.UseFairFightLookDirection = false;
                 ability.user.CastBlocksAbilityUsage = true;
                 ability.user.CastBlocksMovement = true;
+                ability.user.IgnoreCollisions = true;
 
                 // test if the player dodged an attack
                 ability.dodged = ability.user.GetOpponentsInAttackRange()
@@ -70,19 +67,18 @@ namespace Character.Abilities.Shared {
         private class Phase2 : AbilityPhase {
             private new readonly DodgeAbility ability;
 
-            public Phase2(DodgeAbility ability) : base(ability, 0.5f, false) {
+            public Phase2(DodgeAbility ability) : base(ability, 0.75f) {
                 this.ability = ability;
             }
 
             protected override void OnStart() {
+                ability.user.StopMoving();
+
                 if (!ability.dodged)
                     return;
 
                 // prepare the visual effects
-                EffectsController.FilmGrain.active = true;
-                EffectsController.Vignette.active = true;
-                EffectsController.Vignette.color = new ColorParameter(VignetteColor);
-                EffectsController.MotionBlur.active = true;
+                EffectsController.Prepare();
             }
 
             protected override void OnUpdate() {
@@ -90,30 +86,30 @@ namespace Character.Abilities.Shared {
                     return;
 
                 // lerp the game speed and the player speed
-                GameController.GameTickSpeed = Mathf.Lerp(1.0f, 0.1f, Coefficient);
-                GameController.PlayerTickFactor = Mathf.Lerp(1.0f, 5.0f, Coefficient);
+                GameController.GameTickSpeed = Mathf.Lerp(1.0f, GameTickSpeed, Coefficient);
+                GameController.PlayerTickFactor =
+                    Mathf.Lerp(1.0f, GameTickSpeed * PlayerTickFactor, Coefficient) / GameController.GameTickSpeed;
 
                 // lerp effects
-                EffectsController.FilmGrain.intensity.value = Mathf.Lerp(0.0f, FilmGrainIntensity, Coefficient);
-                EffectsController.Vignette.intensity.value = Mathf.Lerp(0.0f, VignetteIntensity, Coefficient);
-                EffectsController.LensDistortion.intensity.value =
-                    Mathf.Lerp(0.0f, LensDistortionIntensity, Coefficient);
+                EffectsController.Lerp(Coefficient);
             }
 
             protected override void OnEnd() {
                 // stop the animation
-                ability.user.Animator.SetBool(ability.Hash, false);
+                ability.user.Animator.SetBool(AnimatorHash.Dodging, false);
+                ability.user.CanTakeDamage = true;
+                ability.user.UseFairFightLookDirection = true;
                 ability.user.CastBlocksMovement = false;
+                ability.user.IgnoreCollisions = false;
+                ability.user.RestoreCollisions();
 
                 // if the player dodged an attack, ensure the lerps are finished
                 if (ability.dodged) {
-                    GameController.GameTickSpeed = 0.1f;
-                    GameController.PlayerTickFactor = 5.0f;
+                    GameController.GameTickSpeed = GameTickSpeed;
+                    GameController.PlayerTickFactor = PlayerTickFactor;
 
                     // also ensure camera effect lerps are finished
-                    EffectsController.FilmGrain.intensity.value = FilmGrainIntensity;
-                    EffectsController.Vignette.intensity.value = VignetteIntensity;
-                    EffectsController.LensDistortion.intensity.value = LensDistortionIntensity;
+                    EffectsController.Lerp(1.0f);
                 } else {
                     // skip Phase3 if the player didn't dodge an attack
                     ability.Abort();
@@ -122,22 +118,20 @@ namespace Character.Abilities.Shared {
         }
 
         private class Phase3 : AbilityPhase {
-            public Phase3(DodgeAbility ability) : base(ability, 2.5f, false) { }
+            public Phase3(Ability ability) : base(ability, 5f, false) { }
         }
 
-        private class FinalPhase : AbilityPhase {
-            public FinalPhase(DodgeAbility ability) : base(ability, 0.5f, false) { }
+        private class FinalPhase : DefaultFinalPhase {
+            public FinalPhase(Ability ability) : base(ability, 1f, false) { }
 
             protected override void OnUpdate() {
                 // lerp the game speed and the player speed back
-                GameController.GameTickSpeed = Mathf.Lerp(0.1f, 1.0f, Coefficient);
-                GameController.PlayerTickFactor = Mathf.Lerp(5.0f, 1.0f, Coefficient);
+                GameController.GameTickSpeed = Mathf.Lerp(GameTickSpeed, 1.0f, Coefficient);
+                GameController.PlayerTickFactor =
+                    Mathf.Lerp(GameTickSpeed * PlayerTickFactor, 1.0f, Coefficient) / GameController.GameTickSpeed;
 
                 // lerp the camera effects back to normal
-                EffectsController.FilmGrain.intensity.value = Mathf.Lerp(FilmGrainIntensity, 0.0f, Coefficient);
-                EffectsController.Vignette.intensity.value = Mathf.Lerp(VignetteIntensity, 0.0f, Coefficient);
-                EffectsController.LensDistortion.intensity.value =
-                    Mathf.Lerp(LensDistortionIntensity, 0.0f, Coefficient);
+                EffectsController.Lerp(1 - Coefficient);
             }
 
             protected override void OnEnd() {
@@ -146,22 +140,16 @@ namespace Character.Abilities.Shared {
                 GameController.PlayerTickFactor = 1.0f;
 
                 // stop the visual effects
-                EffectsController.FilmGrain.active = false;
-                EffectsController.Vignette.active = false;
-                EffectsController.MotionBlur.active = false;
+                EffectsController.ResetEffects();
 
                 // allow the player to use abilities again
                 ability.user.CastBlocksAbilityUsage = false;
 
+                // also start the cooldown of the partner's ability
+                GameController.OtherPlayer.AbilityDodge.StartCooldown();
+
                 base.OnEnd();
             }
         }
-    }
-
-    public enum DashDirection {
-        Forward,
-        Backward,
-        Left,
-        Right
     }
 }

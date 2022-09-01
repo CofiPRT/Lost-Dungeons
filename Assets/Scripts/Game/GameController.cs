@@ -17,12 +17,12 @@ namespace Game {
         /* default instances - to be set in inspector */
         public GenericPlayer defaultPlayer1;
         public GenericPlayer defaultPlayer2;
-
         public GenericEnemy defaultEnemyWhite;
+        public Canvas defaultHealthBar;
 
         /* game data */
 
-        private GenericPlayer controllerPlayer;
+        private GenericPlayer controlledPlayer;
         private GenericPlayer player1;
         private GenericPlayer player2;
 
@@ -33,7 +33,10 @@ namespace Game {
 
         public static GenericPlayer Player1 => Instance.player1;
         public static GenericPlayer Player2 => Instance.player2;
-        public static GenericPlayer ControlledPlayer => Instance.controllerPlayer;
+        public static GenericPlayer ControlledPlayer => Instance.controlledPlayer;
+
+        public static GenericPlayer OtherPlayer =>
+            Instance.controlledPlayer == Instance.player1 ? Instance.player2 : Instance.player1;
 
         public static float GameTickSpeed {
             get => Instance.gameTickSpeed;
@@ -45,13 +48,26 @@ namespace Game {
             set => Instance.playerTickFactor = value;
         }
 
-
         private void Start() {
             player1 = Instantiate(defaultPlayer1, new Vector3(0, 1, 0), Quaternion.identity);
             player2 = Instantiate(defaultPlayer2, new Vector3(1, 0, 0), Quaternion.identity);
 
-            controllerPlayer = player1;
-            controllerPlayer.SetAI(false);
+            controlledPlayer = player1;
+            controlledPlayer.SetAI(false);
+
+            player1.HideHealthBar();
+            player2.HideHealthBar();
+        }
+
+        public static void ChangePlayers() {
+            Instance.controlledPlayer.SetAI(true);
+            Instance.controlledPlayer =
+                Instance.controlledPlayer == Instance.player1 ? Instance.player2 : Instance.player1;
+            Instance.controlledPlayer.SetAI(false);
+        }
+
+        public static Canvas InstantiateHealthBar(Transform parent) {
+            return Instantiate(Instance.defaultHealthBar, parent);
         }
 
         public static void SpawnDebugEnemy() {

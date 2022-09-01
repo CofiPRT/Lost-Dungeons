@@ -82,7 +82,7 @@ namespace Character.Implementation.Base {
             // intentionally left blank
         }
 
-        private bool CanStartAttack => IsAlive && !IsAttacking && !IsStunned;
+        protected virtual bool CanStartAttack => IsAlive && !IsAttacking && !IsStunned;
 
         public void StartAttack(Vector2 direction) {
             if (!CanStartAttack) return;
@@ -96,7 +96,6 @@ namespace Character.Implementation.Base {
 
             // random attack animation
             Animator.SetInteger(AnimatorHash.AttackID, GetAttackID());
-            Animator.SetFloat(AnimatorHash.AttackTickSpeed, AttackSpeed * TickSpeed);
         }
 
         private int GetAttackID() {

@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Character.Implementation.Ally.AIChecks;
 using Character.Implementation.Base;
 using Character.Implementation.Enemy;
 using Character.Implementation.Player;
 using Game;
-using Properties;
-using UnityEngine;
 
 namespace Character.Implementation.Ally {
     public abstract class GenericAlly : GenericCharacter, IComparable<GenericAlly> {
-        private const float SearchRadius = 10f;
-
         protected GenericAlly(CharacterBuilder data) : base(data) {
             FairFight = new FairFight(this);
             AIChecks = new BaseAICheck[] {
@@ -34,17 +28,28 @@ namespace Character.Implementation.Ally {
         /* Parent */
 
         protected override void OnAttackSuccess(GenericCharacter target, float damageDealt) {
-            if (!target.IsAlive) return; // target was killed by this blow, don't subscribe
+            if (!target.IsAlive) {
+                if (FairFight.LastFoughtEnemy == target)
+                    FairFight.LastFoughtEnemy = null;
 
-            if (!(target is GenericEnemy enemy)) return;
+                return; // target was killed by this blow, don't subscribe
+            }
 
-            // unsubscribe from other fights if the character is waiting in one
-            if (enemy.FairFight != null && enemy.FairFight != FairFight && enemy.FairFight.IsWaiting(enemy))
-                enemy.FairFight.Unsubscribe(enemy);
+            if (!(target is GenericEnemy enemy))
+                return;
 
-            // subscribe to this fight
-            FairFight.LastFoughtEnemy = enemy;
-            FairFight.ForceSubscribe(enemy);
+            if (enemy.FairFight != null && enemy.FairFight != FairFight) {
+                // unsubscribe from other fights if the character is waiting in one
+                if (enemy.FairFight.IsWaiting(enemy)) {
+                    enemy.FairFight.Unsubscribe(enemy);
+
+                    // subscribe to this fight
+                    FairFight.ForceSubscribe(enemy);
+                }
+            } else {
+                // force subscribe to this fight
+                FairFight.ForceSubscribe(enemy);
+            }
         }
 
         public override void OnDamageTaken(float damageTaken, GenericCharacter source) {
@@ -55,12 +60,15 @@ namespace Character.Implementation.Ally {
             FairFight.LastFoughtEnemy = enemy;
         }
 
+        public bool UseFairFightLookDirection { get; set; } = true;
+
         public override void UpdateLookDirection() {
             // override the look direction if instructed
-            if (FairFight.InFight && !IsBlocking && !IsAttacking && !IsRunning) {
+            if (UseFairFightLookDirection && FairFight.InFight && !IsBlocking && !IsAttacking && !IsRunning) {
                 // ensure last fought enemy is set
                 FairFight.LastFoughtEnemy ??= FairFight.GetRandomFightingEnemy();
-                LookDirection = FairFight.LastFoughtEnemy.Pos2D - Pos2D;
+                if (FairFight.LastFoughtEnemy.IsAlive)
+                    LookDirection = FairFight.LastFoughtEnemy.Pos2D - Pos2D;
             }
 
             base.UpdateLookDirection();

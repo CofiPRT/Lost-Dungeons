@@ -1,7 +1,7 @@
-﻿using Character.Implementation.Base;
+﻿using UnityEngine;
 
 namespace Character.Implementation.Player {
     public class PlayerTristian : GenericPlayer {
-        public PlayerTristian() : base("Tristian") { }
+        public PlayerTristian() : base("Tristian", Color.red) { }
     }
 }

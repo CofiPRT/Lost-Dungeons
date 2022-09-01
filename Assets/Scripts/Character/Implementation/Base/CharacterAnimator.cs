@@ -14,5 +14,15 @@ namespace Character.Implementation.Base {
             Team.Enemy => GameController.GameTickSpeed,
             _ => 1
         };
+
+        private void UpdateTickSpeeds() {
+            Animator.SetFloat(AnimatorHash.AnimationTickSpeed, TickSpeed);
+            Animator.SetFloat(AnimatorHash.MovementTickSpeed, MovementSpeedFactor * TickSpeed);
+            Animator.SetFloat(AnimatorHash.AttackTickSpeed, AttackSpeed * TickSpeed);
+        }
+
+        private void AwakeAnimator() {
+            Animator = GetComponent<Animator>();
+        }
     }
 }
