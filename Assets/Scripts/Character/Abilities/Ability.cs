@@ -3,12 +3,18 @@ using Character.Implementation.Player;
 using UnityEngine;
 
 namespace Character.Abilities {
-    public abstract class Ability {
-        internal readonly GenericPlayer user;
+    public interface IAbility {
+        GenericPlayer User { get; }
+        void StartCooldown();
+        void Update();
+    }
+
+    public abstract class Ability<T> : IAbility where T : IAbility {
+        public GenericPlayer User { get; }
         private readonly float cooldown;
 
-        protected AbilityPhase[] phases = Array.Empty<AbilityPhase>();
-        protected AbilityPhase finalPhase;
+        protected AbilityPhase<T>[] phases = Array.Empty<AbilityPhase<T>>();
+        protected AbilityPhase<T> finalPhase;
 
         private int currentPhase;
         private float currentCooldown;
@@ -16,15 +22,13 @@ namespace Character.Abilities {
         private bool aborted;
 
         protected Ability(GenericPlayer user, float cooldown) {
-            this.user = user;
+            User = user;
             this.cooldown = cooldown;
-
-            finalPhase = new DefaultFinalPhase(this);
         }
 
         public bool Use() {
             // if on cooldown, or another ability blocks this cast, don't start
-            if (currentCooldown > 0 || user.CastBlocksAbilityUsage)
+            if (currentCooldown > 0 || User.CastBlocksAbilityUsage)
                 return false;
 
             // if already active, offer a reactivation to the current phase
@@ -37,7 +41,7 @@ namespace Character.Abilities {
         }
 
         public void Update() {
-            currentCooldown = Mathf.Max(0, currentCooldown - user.DeltaTime);
+            currentCooldown = Mathf.Max(0, currentCooldown - User.DeltaTime);
 
             // only update while active
             if (!active)
@@ -58,7 +62,7 @@ namespace Character.Abilities {
                 currentPhase++;
         }
 
-        internal void StartCooldown() {
+        public void StartCooldown() {
             active = false;
             currentCooldown = cooldown;
         }

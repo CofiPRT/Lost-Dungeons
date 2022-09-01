@@ -2,10 +2,10 @@
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        public float StunDuration { get; set; }
-        public bool IsStunned => StunDuration > 0;
+        private float StunDuration { get; set; }
+        private bool IsStunned => StunDuration > 0;
 
-        public virtual bool AttemptStun(float stunDuration, GenericCharacter source) {
+        protected virtual bool AttemptStun(float stunDuration, GenericCharacter source) {
             if (!IsAlive || stunDuration <= 0) return false;
 
             StunDuration = stunDuration;
@@ -17,7 +17,7 @@ namespace Character.Implementation.Base {
             return true;
         }
 
-        public void UpdateStunDuration() {
+        private void UpdateStunDuration() {
             if (!IsAlive)
                 return;
 
@@ -26,7 +26,7 @@ namespace Character.Implementation.Base {
                 EndStun();
         }
 
-        public void EndStun() {
+        private void EndStun() {
             StunDuration = 0;
             Animator.SetBool(AnimatorHash.Stunned, false);
         }

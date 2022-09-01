@@ -18,7 +18,7 @@ namespace Character.Implementation.Ally {
             };
         }
 
-        public FairFight FairFight { get; }
+        public FairFight FairFight { get; set; }
         public GenericPlayer Leader => GameController.ControlledPlayer;
 
         public void UpdateFairFight() {
@@ -52,7 +52,7 @@ namespace Character.Implementation.Ally {
             }
         }
 
-        public override void OnDamageTaken(float damageTaken, GenericCharacter source) {
+        protected override void OnDamageTaken(float damageTaken, GenericCharacter source) {
             base.OnDamageTaken(damageTaken, source);
 
             if (!(source is GenericEnemy enemy)) return;
@@ -62,7 +62,7 @@ namespace Character.Implementation.Ally {
 
         public bool UseFairFightLookDirection { get; set; } = true;
 
-        public override void UpdateLookDirection() {
+        protected override void UpdateLookDirection() {
             // override the look direction if instructed
             if (UseFairFightLookDirection && FairFight.InFight && !IsBlocking && !IsAttacking && !IsRunning) {
                 // ensure last fought enemy is set
@@ -74,7 +74,7 @@ namespace Character.Implementation.Ally {
             base.UpdateLookDirection();
         }
 
-        public override void OnDeath() {
+        protected override void OnDeath() {
             base.OnDeath();
 
             // unsubscribe all the enemies from this fight

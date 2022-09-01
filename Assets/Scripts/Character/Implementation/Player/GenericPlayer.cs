@@ -11,6 +11,7 @@ namespace Character.Implementation.Player {
             SignatureColor = signatureColor;
             AbilityDodge = new DodgeAbility(this);
             AbilitySwitch = new SwitchAbility(this);
+            AbilityTagTeam = new TagTeamAbility(this);
         }
 
         private static CharacterBuilder CreateData(string name) {
@@ -25,14 +26,14 @@ namespace Character.Implementation.Player {
         /* Shared Abilities */
 
         public DodgeAbility AbilityDodge { get; }
-        public Ability AbilitySwitch { get; }
-        public Ability AbilityTagTeam { get; }
+        public SwitchAbility AbilitySwitch { get; }
+        public TagTeamAbility AbilityTagTeam { get; }
 
         /* Specific Abilities */
 
-        public Ability Ability1 { get; }
-        public Ability Ability2 { get; }
-        public Ability Ultimate { get; }
+        public IAbility Ability1 { get; }
+        public IAbility Ability2 { get; }
+        public IAbility Ultimate { get; }
 
         /* Ability Logic */
 
@@ -41,8 +42,8 @@ namespace Character.Implementation.Player {
         public bool CastBlocksAttack { get; set; }
         public bool CastBlocksBlock { get; set; }
 
-        public IEnumerable<Ability> Abilities => new[]
-            { AbilityDodge, AbilitySwitch /*, AbilityTagTeam, Ability1, Ability2, Ultimate*/ };
+        public IEnumerable<IAbility> Abilities => new IAbility[]
+            { AbilityDodge, AbilitySwitch, AbilityTagTeam /*Ability1, Ability2, Ultimate*/ };
 
         public void UpdateAbilities() {
             if (!IsAlive)
@@ -54,6 +55,27 @@ namespace Character.Implementation.Player {
 
         public bool StartDodge(Vector2 direction) {
             return AbilityDodge.Use(direction);
+        }
+
+        public bool StartTagTeam(bool changePlayers) {
+            return AbilityTagTeam.Use(changePlayers);
+        }
+
+        /* Util */
+
+        public void SwapPositions(GenericPlayer other) {
+            var ownTransform = transform;
+            var otherTransform = other.transform;
+
+            (ownTransform.position, otherTransform.position) = (otherTransform.position, ownTransform.position);
+        }
+
+        public void SwapFairFights(GenericPlayer other) {
+            (FairFight, other.FairFight) = (other.FairFight, FairFight);
+
+            // also change owners of the fair fights
+            FairFight.Owner = this;
+            other.FairFight.Owner = other;
         }
 
         /* Parent */

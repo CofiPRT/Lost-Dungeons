@@ -51,6 +51,7 @@ namespace Camera {
             Instance.lensDistortionIntensity = lensDistortionIntensity;
             Instance.bloomIntensity = bloomIntensity;
 
+            Instance.vignette.color.value = Instance.vignetteStartColor;
             Instance.vignette.active = true;
             Instance.filmGrain.active = true;
             Instance.lensDistortion.active = true;

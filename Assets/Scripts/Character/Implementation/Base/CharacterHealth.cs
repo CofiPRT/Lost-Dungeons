@@ -3,12 +3,12 @@
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
         public bool IsAlive => Health > 0;
-        public float DeathTime { get; set; }
-        public float Health { get; set; }
+        private float DeathTime { get; set; }
+        public float Health { get; private set; }
         public float MaxHealth { get; }
         public bool CanTakeDamage { get; set; } = true;
 
-        public float TakeDamage(float damage, GenericCharacter source = null) {
+        private float TakeDamage(float damage, GenericCharacter source = null) {
             if (!IsAlive || !CanTakeDamage)
                 return 0;
 
@@ -32,7 +32,7 @@ namespace Character.Implementation.Base {
             return damageDealt;
         }
 
-        public virtual void OnDamageTaken(float damageTaken, GenericCharacter source) {
+        protected virtual void OnDamageTaken(float damageTaken, GenericCharacter source) {
             Animator.SetBool(AnimatorHash.Hurt, true);
         }
 
@@ -47,7 +47,7 @@ namespace Character.Implementation.Base {
             Health = Math.Min(MaxHealth, Health + healAmount);
         }
 
-        public virtual void OnDeath() {
+        protected virtual void OnDeath() {
             EndAttack();
             EndStun();
             StopMoving();
@@ -58,7 +58,7 @@ namespace Character.Implementation.Base {
             Animator.SetBool(AnimatorHash.Dead, true);
         }
 
-        public void UpdateDeathTime() {
+        private void UpdateDeathTime() {
             if (IsAlive)
                 return;
 

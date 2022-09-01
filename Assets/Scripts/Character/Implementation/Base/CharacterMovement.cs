@@ -2,14 +2,17 @@
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        public Vector2 LookDirection { get; set; }
-        public Vector2 MovementApplication { get; set; }
-        public bool IsRunning { get; set; }
-        public Vector2 Velocity { get; set; }
-        public float Acceleration { get; }
-        public float Deceleration { get; }
-        public float RotationSpeed { get; }
-        public float MovementSpeedFactor => 1;
+        protected Vector2 LookDirection { get; set; }
+        protected bool IsRunning { get; set; }
+
+        private Vector2 MovementApplication { get; set; }
+        private Vector2 Velocity { get; set; }
+
+        private float Acceleration { get; }
+        private float Deceleration { get; }
+        private float RotationSpeed { get; }
+        private float MovementSpeedFactor => 1;
+
         protected virtual bool CanApplyMovement => IsAlive && !IsStunned && !AttackBlocksMovement;
 
         public void ApplyMovement(Vector2 direction, bool run, bool syncLookDirection) {
@@ -64,7 +67,7 @@ namespace Character.Implementation.Base {
             MovementApplication = Vector2.zero;
         }
 
-        public void UpdateMovement() {
+        private void UpdateMovement() {
             ApplyDeceleration();
             ApplyAcceleration();
 
@@ -78,7 +81,7 @@ namespace Character.Implementation.Base {
             Velocity = Vector2.zero;
         }
 
-        public virtual void UpdateLookDirection() {
+        protected virtual void UpdateLookDirection() {
             if (!IsAlive)
                 return;
 

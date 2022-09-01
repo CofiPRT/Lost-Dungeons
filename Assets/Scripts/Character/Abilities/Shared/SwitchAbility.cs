@@ -4,13 +4,15 @@ using Game;
 using UnityEngine;
 
 namespace Character.Abilities.Shared {
-    public class SwitchAbility : Ability {
+    public class SwitchAbility : Ability<SwitchAbility> {
         private const float Cooldown = 1f;
 
         private const float GameTickSpeed = 0.1f;
 
+        private GenericPlayer otherUser;
+
         public SwitchAbility(GenericPlayer user) : base(user, Cooldown) {
-            phases = new AbilityPhase[] {
+            phases = new AbilityPhase<SwitchAbility>[] {
                 new Phase1(this),
                 new Phase2(this),
                 new Phase3(this),
@@ -19,23 +21,32 @@ namespace Character.Abilities.Shared {
             finalPhase = new FinalPhase(this);
         }
 
-        private class Phase1 : AbilityPhase {
-            public Phase1(Ability ability) : base(ability, 0.5f, false) { }
+        public new bool Use() {
+            if (!base.Use())
+                return false;
+
+            otherUser = GameController.OtherPlayer;
+
+            return true;
+        }
+
+        private class Phase1 : AbilityPhase<SwitchAbility> {
+            public Phase1(SwitchAbility ability) : base(ability, 0.5f, false) { }
 
             protected override void OnStart() {
-                var startColor = ability.user.SignatureColor;
+                var startColor = ability.User.SignatureColor;
                 var endColor = GameController.OtherPlayer.SignatureColor;
 
                 // prepare the visual effects
                 EffectsController.Prepare(startColor, endColor, 0.3f);
 
                 // perform ability logic
-                ability.user.CastBlocksAbilityUsage = true;
-                ability.user.CastBlocksAttack = true;
-                ability.user.CastBlocksBlock = true;
-                GameController.OtherPlayer.CastBlocksAbilityUsage = true;
-                GameController.OtherPlayer.CastBlocksAttack = true;
-                GameController.OtherPlayer.CastBlocksBlock = true;
+                ability.User.CastBlocksAbilityUsage = true;
+                ability.User.CastBlocksAttack = true;
+                ability.User.CastBlocksBlock = true;
+                ability.otherUser.CastBlocksAbilityUsage = true;
+                ability.otherUser.CastBlocksAttack = true;
+                ability.otherUser.CastBlocksBlock = true;
             }
 
             protected override void OnUpdate() {
@@ -53,16 +64,16 @@ namespace Character.Abilities.Shared {
             }
         }
 
-        private class Phase2 : AbilityPhase {
-            public Phase2(Ability ability) : base(ability, 0.5f, false) { }
+        private class Phase2 : AbilityPhase<SwitchAbility> {
+            public Phase2(SwitchAbility ability) : base(ability, 0.5f, false) { }
 
             protected override void OnEnd() {
                 GameController.ChangePlayers();
             }
         }
 
-        private class Phase3 : AbilityPhase {
-            public Phase3(Ability ability) : base(ability, 0.5f, false) { }
+        private class Phase3 : AbilityPhase<SwitchAbility> {
+            public Phase3(SwitchAbility ability) : base(ability, 0.5f, false) { }
 
             protected override void OnUpdate() {
                 // lerp color
@@ -71,14 +82,20 @@ namespace Character.Abilities.Shared {
                 // lerp HUD positions
                 HUDController.LerpPositions(Coefficient);
             }
+
+            protected override void OnEnd() {
+                // ensure lerps are finished
+                EffectsController.Lerp(1.0f, false);
+                HUDController.LerpPositions(1.0f);
+            }
         }
 
-        private class Phase4 : AbilityPhase {
-            public Phase4(Ability ability) : base(ability, 0.5f, false) { }
+        private class Phase4 : AbilityPhase<SwitchAbility> {
+            public Phase4(SwitchAbility ability) : base(ability, 0.5f, false) { }
         }
 
-        private class FinalPhase : DefaultFinalPhase {
-            public FinalPhase(Ability ability) : base(ability, 0.5f, false) { }
+        private class FinalPhase : DefaultFinalPhase<SwitchAbility> {
+            public FinalPhase(SwitchAbility ability) : base(ability, 0.5f, false) { }
 
             protected override void OnUpdate() {
                 // lerp game time, effects, and HUD back
@@ -94,16 +111,16 @@ namespace Character.Abilities.Shared {
                 HUDController.LerpOtherSizeDown(1.0f);
 
                 // also start the cooldown of the partner's ability
-                GameController.OtherPlayer.AbilitySwitch.StartCooldown();
+                ability.otherUser.AbilitySwitch.StartCooldown();
 
                 // end ability logic
-                ability.user.CastBlocksAbilityUsage = false;
-                ability.user.CastBlocksAttack = false;
-                ability.user.CastBlocksBlock = false;
-                ability.user.StopBlocking();
-                GameController.ControlledPlayer.CastBlocksAbilityUsage = false;
-                GameController.ControlledPlayer.CastBlocksAttack = false;
-                GameController.ControlledPlayer.CastBlocksBlock = false;
+                ability.User.CastBlocksAbilityUsage = false;
+                ability.User.CastBlocksAttack = false;
+                ability.User.CastBlocksBlock = false;
+                ability.User.StopBlocking();
+                ability.otherUser.CastBlocksAbilityUsage = false;
+                ability.otherUser.CastBlocksAttack = false;
+                ability.otherUser.CastBlocksBlock = false;
 
                 base.OnEnd();
             }

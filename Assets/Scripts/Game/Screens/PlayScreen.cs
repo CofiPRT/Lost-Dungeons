@@ -12,12 +12,40 @@ namespace Game.Screens {
 
         private bool prevPressedP;
 
+        private float spaceCooldown;
+        private int spaceTaps;
+        private float spaceHeldFor;
+        private bool spaceHeldDown;
+
         public override void Update() {
             // handle switch ability
-            if (Input.GetKey(KeyCode.Space)) {
-                GameController.ControlledPlayer.AbilitySwitch.Use();
-                return;
+            if (spaceCooldown == 0)
+                spaceTaps = 0;
+
+            spaceCooldown = Mathf.Max(0f, spaceCooldown - Time.deltaTime);
+
+            if (Input.GetKeyDown(KeyCode.Space)) {
+                if (spaceTaps == 0) {
+                    spaceTaps = 1;
+                    spaceCooldown = 0.35f;
+                } else if (spaceTaps == 1 && spaceCooldown > 0) {
+                    GameController.ControlledPlayer.StartTagTeam(true);
+                }
+
+                spaceHeldDown = true;
+                spaceHeldFor = 0;
             }
+
+            if (Input.GetKeyUp(KeyCode.Space))
+                spaceHeldDown = false;
+
+            if (spaceHeldDown)
+                spaceHeldFor += Time.deltaTime;
+
+            if (spaceHeldDown && spaceHeldFor > 0.5f)
+                GameController.ControlledPlayer.StartTagTeam(false);
+            else if (!spaceHeldDown && spaceCooldown == 0 && spaceTaps == 1)
+                GameController.ControlledPlayer.AbilitySwitch.Use();
 
             // handle player movement
             var direction = Vector2.zero;

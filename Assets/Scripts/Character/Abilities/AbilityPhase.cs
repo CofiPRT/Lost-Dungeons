@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
 namespace Character.Abilities {
-    public abstract class AbilityPhase {
-        protected readonly Ability ability;
+    public abstract class AbilityPhase<TAbility> where TAbility : IAbility {
+        protected readonly TAbility ability;
         private readonly float manaCostPerSecond;
         private readonly float maxDuration;
         private readonly bool useUserDelta;
@@ -14,11 +14,11 @@ namespace Character.Abilities {
         private float duration;
 
         protected float Coefficient => Mathf.Clamp01(duration / maxDuration);
-        private float DeltaTime => useUserDelta ? ability.user.DeltaTime : Time.deltaTime;
+        private float DeltaTime => useUserDelta ? ability.User.DeltaTime : Time.deltaTime;
         internal bool Finished => duration > maxDuration;
 
         protected AbilityPhase(
-            Ability ability,
+            TAbility ability,
             float maxDuration = float.MaxValue,
             bool useUserDelta = true,
             bool requireReactivation = false,
@@ -54,7 +54,7 @@ namespace Character.Abilities {
                 // consume mana and reset the counter
                 secondCounter -= 1;
 
-                if (!ability.user.UseMana(manaCostPerSecond)) {
+                if (!ability.User.UseMana(manaCostPerSecond)) {
                     OnManaDepletion();
                     return; // not enough mana
                 }
@@ -85,10 +85,6 @@ namespace Character.Abilities {
             started = false;
             secondCounter = 0;
             duration = 0;
-        }
-
-        protected void AbortAbility() {
-            ability.Abort();
         }
 
         public virtual void OnReactivation() {

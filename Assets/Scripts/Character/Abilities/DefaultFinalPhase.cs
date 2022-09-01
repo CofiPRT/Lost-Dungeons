@@ -1,7 +1,7 @@
 ﻿namespace Character.Abilities {
-    public class DefaultFinalPhase : AbilityPhase {
+    public class DefaultFinalPhase<TAbility> : AbilityPhase<TAbility> where TAbility : IAbility {
         public DefaultFinalPhase(
-            Ability ability,
+            TAbility ability,
             float maxDuration = 0,
             bool useUserDelta = true,
             bool requireReactivation = false,

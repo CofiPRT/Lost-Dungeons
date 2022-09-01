@@ -132,6 +132,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: -1077516982608008082, guid: 7b00539c31988aa45853463de7e96ded,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -980318418390082500, guid: 7b00539c31988aa45853463de7e96ded,
         type: 3}
       propertyPath: m_Layer
@@ -166,6 +171,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3023738775839896748, guid: 7b00539c31988aa45853463de7e96ded,
+        type: 3}
+      propertyPath: m_Name
+      value: Mesh
       objectReference: {fileID: 0}
     - target: {fileID: 3023738775839896748, guid: 7b00539c31988aa45853463de7e96ded,
         type: 3}
@@ -267,3 +277,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fecd18da9b19438ca9314e80445bd30b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: f3b69321826b5b94199cfa47a5266b54, type: 2}
+  transparentMaterial: {fileID: 2100000, guid: 3e14dfb3a832e734685426a6098f34f8, type: 2}

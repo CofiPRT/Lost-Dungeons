@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        protected bool IsAttacking { get; set; }
+        protected bool IsAttacking { get; private set; }
         public bool IsPreparingToAttack { get; private set; }
         private bool AttackBlocksMovement { get; set; }
 

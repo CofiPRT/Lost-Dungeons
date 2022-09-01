@@ -5,7 +5,7 @@ using Game;
 using UnityEngine;
 
 namespace Character.Abilities.Shared {
-    public class DodgeAbility : Ability {
+    public class DodgeAbility : Ability<DodgeAbility> {
         private const float Cooldown = 5f;
 
         private const float GameTickSpeed = 0.1f;
@@ -15,7 +15,7 @@ namespace Character.Abilities.Shared {
         private bool dodged;
 
         public DodgeAbility(GenericPlayer user) : base(user, Cooldown) {
-            phases = new AbilityPhase[] {
+            phases = new AbilityPhase<DodgeAbility>[] {
                 new Phase1(this),
                 new Phase2(this),
                 new Phase3(this)
@@ -33,46 +33,38 @@ namespace Character.Abilities.Shared {
             return true;
         }
 
-        private class Phase1 : AbilityPhase {
-            private new readonly DodgeAbility ability;
-
-            public Phase1(DodgeAbility ability) : base(ability, 0.25f) {
-                this.ability = ability;
-            }
+        private class Phase1 : AbilityPhase<DodgeAbility> {
+            public Phase1(DodgeAbility ability) : base(ability, 0.25f) { }
 
             protected override void OnStart() {
                 // compute the dash direction relative to body orientation
-                var relativeDashDirection = ability.user.RelativizeToForwardDirection(ability.dashDirection);
+                var relativeDashDirection = ability.User.RelativizeToForwardDirection(ability.dashDirection);
 
                 // run the animation
-                ability.user.Animator.SetBool(AnimatorHash.Dodging, true);
-                ability.user.Animator.SetFloat(AnimatorHash.ForwardSpeedDodge, relativeDashDirection.y);
-                ability.user.Animator.SetFloat(AnimatorHash.SideSpeedDodge, relativeDashDirection.x);
+                ability.User.Animator.SetBool(AnimatorHash.Dodging, true);
+                ability.User.Animator.SetFloat(AnimatorHash.ForwardSpeedDodge, relativeDashDirection.y);
+                ability.User.Animator.SetFloat(AnimatorHash.SideSpeedDodge, relativeDashDirection.x);
 
-                ability.user.CanTakeDamage = false;
-                ability.user.UseFairFightLookDirection = false;
-                ability.user.CastBlocksAbilityUsage = true;
-                ability.user.CastBlocksMovement = true;
-                ability.user.IgnoreCollisions = true;
+                ability.User.CanTakeDamage = false;
+                ability.User.UseFairFightLookDirection = false;
+                ability.User.CastBlocksAbilityUsage = true;
+                ability.User.CastBlocksMovement = true;
+                ability.User.IgnoreCollisions = true;
 
                 // test if the player dodged an attack
-                ability.dodged = ability.user.GetOpponentsInAttackRange()
+                ability.dodged = ability.User.GetOpponentsInAttackRange()
                     .Any(
                         opponent => opponent.IsPreparingToAttack &&
-                                    opponent.OpponentInAttackArea(ability.user)
+                                    opponent.OpponentInAttackArea(ability.User)
                     );
             }
         }
 
-        private class Phase2 : AbilityPhase {
-            private new readonly DodgeAbility ability;
-
-            public Phase2(DodgeAbility ability) : base(ability, 0.75f) {
-                this.ability = ability;
-            }
+        private class Phase2 : AbilityPhase<DodgeAbility> {
+            public Phase2(DodgeAbility ability) : base(ability, 0.75f) { }
 
             protected override void OnStart() {
-                ability.user.StopMoving();
+                ability.User.StopMoving();
 
                 if (!ability.dodged)
                     return;
@@ -96,12 +88,12 @@ namespace Character.Abilities.Shared {
 
             protected override void OnEnd() {
                 // stop the animation
-                ability.user.Animator.SetBool(AnimatorHash.Dodging, false);
-                ability.user.CanTakeDamage = true;
-                ability.user.UseFairFightLookDirection = true;
-                ability.user.CastBlocksMovement = false;
-                ability.user.IgnoreCollisions = false;
-                ability.user.RestoreCollisions();
+                ability.User.Animator.SetBool(AnimatorHash.Dodging, false);
+                ability.User.CanTakeDamage = true;
+                ability.User.UseFairFightLookDirection = true;
+                ability.User.CastBlocksMovement = false;
+                ability.User.IgnoreCollisions = false;
+                ability.User.RestoreCollisions();
 
                 // if the player dodged an attack, ensure the lerps are finished
                 if (ability.dodged) {
@@ -117,12 +109,12 @@ namespace Character.Abilities.Shared {
             }
         }
 
-        private class Phase3 : AbilityPhase {
-            public Phase3(Ability ability) : base(ability, 5f, false) { }
+        private class Phase3 : AbilityPhase<DodgeAbility> {
+            public Phase3(DodgeAbility ability) : base(ability, 5f, false) { }
         }
 
-        private class FinalPhase : DefaultFinalPhase {
-            public FinalPhase(Ability ability) : base(ability, 1f, false) { }
+        private class FinalPhase : DefaultFinalPhase<DodgeAbility> {
+            public FinalPhase(DodgeAbility ability) : base(ability, 1f, false) { }
 
             protected override void OnUpdate() {
                 // lerp the game speed and the player speed back
@@ -143,7 +135,7 @@ namespace Character.Abilities.Shared {
                 EffectsController.ResetEffects();
 
                 // allow the player to use abilities again
-                ability.user.CastBlocksAbilityUsage = false;
+                ability.User.CastBlocksAbilityUsage = false;
 
                 // also start the cooldown of the partner's ability
                 GameController.OtherPlayer.AbilityDodge.StartCooldown();

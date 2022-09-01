@@ -45,6 +45,7 @@ namespace Character.Implementation.Base {
             AwakeAnimator();
             AwakeCollider();
             AwakeHealthBar();
+            AwakeTransparency();
         }
 
         protected delegate void UpdateDelegate();

@@ -9,7 +9,7 @@ namespace Character {
     public class FairFight : IComparable<FairFight> {
         private const int DefaultMaxFightingEnemies = 3;
 
-        public GenericAlly Owner { get; }
+        public GenericAlly Owner { get; set; }
         public GenericEnemy LastFoughtEnemy { get; set; }
 
         private readonly int maxFightingEnemies;

@@ -169,6 +169,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3023738775839896748, guid: cdde20e2e615c4c499fe4ccc2fd05e3c,
         type: 3}
+      propertyPath: m_Name
+      value: Mesh
+      objectReference: {fileID: 0}
+    - target: {fileID: 3023738775839896748, guid: cdde20e2e615c4c499fe4ccc2fd05e3c,
+        type: 3}
       propertyPath: m_Layer
       value: 9
       objectReference: {fileID: 0}
@@ -267,3 +272,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 183a4a271dbe478ab20cffec21e1ec74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: a87f597b6d2b35a4490aec720d055ad6, type: 2}
+  transparentMaterial: {fileID: 2100000, guid: a1412f4f7cbad6f4ea8c01be1d7d79cb, type: 2}

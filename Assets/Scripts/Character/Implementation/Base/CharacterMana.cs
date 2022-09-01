@@ -2,7 +2,7 @@
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        public float Mana { get; set; }
+        public float Mana { get; private set; }
         public float MaxMana { get; }
 
         public bool HasMana(float amount) {

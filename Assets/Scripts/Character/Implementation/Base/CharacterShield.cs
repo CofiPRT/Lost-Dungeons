@@ -4,13 +4,14 @@ using UnityEngine;
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
         private const float FailedBlockStunDuration = 2; // seconds
-        public bool IsBlocking { get; set; }
-        public float ShieldAngle { get; }
-        public float ShieldRechargeTime { get; }
-        public float ShieldCooldown { get; set; }
-        public BlockStrength BlockStrength { get; }
 
-        public float AttemptBlock(float damage, AttackStrength attackStrength, GenericCharacter source) {
+        protected bool IsBlocking { get; private set; }
+        private float ShieldAngle { get; }
+        private float ShieldRechargeTime { get; }
+        private float ShieldCooldown { get; set; }
+        private BlockStrength BlockStrength { get; }
+
+        private float AttemptBlock(float damage, AttackStrength attackStrength, GenericCharacter source) {
             if (!IsBlocking || IsStunned)
                 return TakeDamage(damage, source);
 
@@ -83,7 +84,7 @@ namespace Character.Implementation.Base {
             Animator.SetBool(AnimatorHash.Blocking, false);
         }
 
-        public void UpdateBlock() {
+        private void UpdateBlock() {
             // update cooldown
             ShieldCooldown = Mathf.Max(0, ShieldCooldown - DeltaTime);
         }

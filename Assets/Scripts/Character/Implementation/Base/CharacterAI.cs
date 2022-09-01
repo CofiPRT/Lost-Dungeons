@@ -16,7 +16,7 @@ namespace Character.Implementation.Base {
                 AIAction = null;
         }
 
-        public void UpdateAI() {
+        private void UpdateAI() {
             if (!UseAI)
                 return;
 
@@ -29,12 +29,12 @@ namespace Character.Implementation.Base {
         }
 
         public abstract class BaseAICheck {
-            protected readonly GenericCharacter instance;
+            private readonly GenericCharacter instance;
             private readonly float cooldownMin;
             private readonly float cooldownMax;
             private float cooldown;
 
-            public BaseAICheck(GenericCharacter instance, float cooldownMin = 0f, float cooldownMax = 1f) {
+            protected BaseAICheck(GenericCharacter instance, float cooldownMin = 0f, float cooldownMax = 1f) {
                 this.instance = instance;
                 this.cooldownMin = cooldownMin;
                 this.cooldownMax = cooldownMax;
@@ -59,7 +59,7 @@ namespace Character.Implementation.Base {
             private float duration;
             private bool started;
 
-            public BaseAIAction(GenericCharacter instance, float maxDuration = Mathf.Infinity) {
+            protected BaseAIAction(GenericCharacter instance, float maxDuration = Mathf.Infinity) {
                 this.instance = instance;
                 this.maxDuration = maxDuration;
             }

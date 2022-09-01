@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        public Rigidbody RigidBody { get; set; }
-        public Collider Collider { get; set; }
+        private Rigidbody RigidBody { get; set; }
+        private Collider Collider { get; set; }
         public bool IgnoreCollisions { get; set; }
 
         private int CollisionLayers { get; set; }
