@@ -1,4 +1,5 @@
 ﻿using System;
+using Character.Misc;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
@@ -7,8 +8,10 @@ namespace Character.Implementation.Base {
         public float Health { get; private set; }
         public float MaxHealth { get; }
         public bool CanTakeDamage { get; set; } = true;
+        protected internal virtual bool IsDetectable => true;
+        private float LastDamageTime { get; set; }
 
-        private float TakeDamage(float damage, GenericCharacter source = null) {
+        protected virtual float TakeDamage(float damage, GenericCharacter source = null) {
             if (!IsAlive || !CanTakeDamage)
                 return 0;
 
@@ -26,14 +29,20 @@ namespace Character.Implementation.Base {
             OnDeath();
 
             // notify the killer
-            if (source)
+            if (source != null)
                 source.OnKill(this);
 
             return damageDealt;
         }
 
         protected virtual void OnDamageTaken(float damageTaken, GenericCharacter source) {
+            // consume stun
+            EndStun();
+
             Animator.SetBool(AnimatorHash.Hurt, true);
+            LastDamageTime = 0;
+            secondCounter = 0;
+            secondCounterMana = 0;
         }
 
         public void StopHurtAnimation() {
@@ -68,6 +77,24 @@ namespace Character.Implementation.Base {
 
             Destroy(gameObject);
             Destroy(healthBarCanvas.gameObject);
+        }
+
+        private float secondCounter;
+
+        private void UpdateAutoHeal() {
+            LastDamageTime += DeltaTime;
+
+            if (LastDamageTime < 5f || Health >= 25f)
+                return;
+
+            // heal 5 health every second
+            secondCounter += DeltaTime;
+
+            if (secondCounter < 1f)
+                return;
+
+            secondCounter = 0;
+            Heal(5);
         }
     }
 }

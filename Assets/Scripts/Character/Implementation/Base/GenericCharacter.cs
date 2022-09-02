@@ -57,6 +57,8 @@ namespace Character.Implementation.Base {
             UpdateAI();
             UpdateBlock();
             UpdateHealthBar();
+            UpdateAutoHeal();
+            UpdateAutoManaGain();
         };
 
         protected UpdateDelegate FixedUpdateActions => delegate {

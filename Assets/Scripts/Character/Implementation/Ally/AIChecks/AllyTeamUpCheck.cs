@@ -8,7 +8,7 @@ namespace Character.Implementation.Ally.AIChecks {
     public class AllyTeamUpCheck : GenericCharacter.BaseAICheck {
         private const float SearchRadius = 10f;
 
-        private new readonly GenericAlly instance;
+        private readonly GenericAlly instance;
 
         public AllyTeamUpCheck(GenericAlly instance) : base(instance, 2, 3) {
             this.instance = instance;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Character.Misc;
 using Properties;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,13 +13,15 @@ namespace Character.Implementation.Base {
         private bool AttackBlocksMovement { get; set; }
 
         private float AttackDamage { get; }
-        private float AttackSpeed { get; }
+        protected virtual float AttackSpeed { get; }
         internal float AttackRange { get; }
         private float AttackAngle { get; }
         private AttackStrength AttackStrength { get; }
 
         private float LastAttackTimestamp { get; set; }
         private int AttackStreak { get; set; }
+
+        protected virtual bool CanUseRareFinisher => false;
 
         protected internal IEnumerable<Team> AttackableTeams => Team switch {
             Team.Player => new[] { Team.Enemy },
@@ -84,7 +87,7 @@ namespace Character.Implementation.Base {
 
         protected virtual bool CanStartAttack => IsAlive && !IsAttacking && !IsStunned;
 
-        public void StartAttack(Vector2 direction) {
+        public virtual void StartAttack(Vector2 direction) {
             if (!CanStartAttack) return;
 
             IsAttacking = true;
@@ -110,7 +113,7 @@ namespace Character.Implementation.Base {
             if (AttackStreak >= 3) {
                 AttackStreak = 0;
                 AttackBlocksMovement = true;
-                return Random.Range(5, 7 + 1);
+                return Random.Range(5, 7 + 1 + (CanUseRareFinisher ? 1 : 0));
             }
 
             // combo animation, continue streak

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Character {
+namespace Character.Misc {
     public static class AnimatorHash {
         // save hashes for faster parameter acquisition
         public static readonly int AnimationTickSpeed = Animator.StringToHash("animationTickSpeed");

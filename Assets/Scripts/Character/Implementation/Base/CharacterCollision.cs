@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Character.Implementation.Base {
@@ -7,6 +6,8 @@ namespace Character.Implementation.Base {
         private Rigidbody RigidBody { get; set; }
         private Collider Collider { get; set; }
         public bool IgnoreCollisions { get; set; }
+
+        public Vector3 CenterOfMass => RigidBody.worldCenterOfMass;
 
         private int CollisionLayers { get; set; }
         private readonly List<Collider> ignoredColliders = new List<Collider>();

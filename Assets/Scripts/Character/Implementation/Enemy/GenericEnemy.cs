@@ -3,6 +3,7 @@ using System.Linq;
 using Character.Implementation.Ally;
 using Character.Implementation.Base;
 using Character.Implementation.Enemy.AIChecks;
+using Character.Misc;
 using Properties;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace Character.Implementation.Enemy {
                     LayerMask.GetMask(AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
                 )
                 .Select(x => x.GetComponent<GenericAlly>())
-                .Where(x => x != null && x.IsAlive)
+                .Where(x => x != null && x.IsAlive && x.IsDetectable)
                 .ToList();
         }
 

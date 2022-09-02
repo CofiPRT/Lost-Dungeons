@@ -10,8 +10,6 @@ namespace Game.Screens {
             CameraController.Instance.ApplyInput(horizontalMovement, verticalMovement);
         }
 
-        private bool prevPressedP;
-
         private float spaceCooldown;
         private int spaceTaps;
         private float spaceHeldFor;
@@ -66,6 +64,16 @@ namespace Game.Screens {
                 startedDodge = GameController.ControlledPlayer.StartDodge(direction);
 
             if (!startedDodge) {
+                // handle abilities
+                if (Input.GetKey(KeyCode.Alpha1))
+                    GameController.ControlledPlayer.Ability1.Use();
+
+                if (Input.GetKey(KeyCode.Alpha2))
+                    GameController.ControlledPlayer.Ability2.Use();
+
+                if (Input.GetKey(KeyCode.Alpha3))
+                    GameController.ControlledPlayer.Ultimate.Use();
+
                 var running = Input.GetKey(KeyCode.LeftShift);
 
                 if (direction.magnitude > 0)
@@ -90,10 +98,11 @@ namespace Game.Screens {
             }
 
             // handle debug spawning
-            if (Input.GetKeyDown(KeyCode.P) && !prevPressedP)
+            if (Input.GetKeyDown(KeyCode.P))
                 GameController.SpawnDebugEnemy();
 
-            prevPressedP = Input.GetKey(KeyCode.P);
+            if (Input.GetKeyDown(KeyCode.L))
+                GameController.SpawnDebugProp();
         }
     }
 }

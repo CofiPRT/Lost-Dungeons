@@ -1,4 +1,3 @@
-using Character.Implementation.Enemy;
 using Character.Implementation.Player;
 using UnityEngine;
 
@@ -12,13 +11,13 @@ namespace Game {
                 Destroy(this);
             else
                 Instance = this;
+
+            defaultInstances = GetComponent<Instances>();
         }
 
-        /* default instances - to be set in inspector */
-        public GenericPlayer defaultPlayer1;
-        public GenericPlayer defaultPlayer2;
-        public GenericEnemy defaultEnemyWhite;
-        public Canvas defaultHealthBar;
+        private Instances defaultInstances;
+
+        public static Instances DefaultInstances => Instance.defaultInstances;
 
         /* game data */
 
@@ -49,8 +48,8 @@ namespace Game {
         }
 
         private void Start() {
-            player1 = Instantiate(defaultPlayer1, new Vector3(0, 1, 0), Quaternion.identity);
-            player2 = Instantiate(defaultPlayer2, new Vector3(1, 0, 0), Quaternion.identity);
+            player1 = Instantiate(defaultInstances.tristian, new Vector3(0, 1, 0), Quaternion.identity);
+            player2 = Instantiate(defaultInstances.reinald, new Vector3(1, 0, 0), Quaternion.identity);
 
             controlledPlayer = player1;
             controlledPlayer.SetAI(false);
@@ -66,13 +65,17 @@ namespace Game {
             Instance.controlledPlayer.SetAI(false);
         }
 
-        public static Canvas InstantiateHealthBar(Transform parent) {
-            return Instantiate(Instance.defaultHealthBar, parent);
-        }
-
         public static void SpawnDebugEnemy() {
             Instantiate(
-                Instance.defaultEnemyWhite,
+                DefaultInstances.enemyWhite,
+                ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
+                Quaternion.identity
+            );
+        }
+
+        public static void SpawnDebugProp() {
+            Instantiate(
+                DefaultInstances.bottle,
                 ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
                 Quaternion.identity
             );

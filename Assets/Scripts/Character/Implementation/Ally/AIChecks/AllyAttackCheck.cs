@@ -1,10 +1,9 @@
 ﻿using Character.Implementation.Base;
 using Character.Implementation.Base.AIActions;
-using UnityEngine;
 
 namespace Character.Implementation.Ally.AIChecks {
     public class AllyAttackCheck : GenericCharacter.BaseAICheck {
-        private new readonly GenericAlly instance;
+        private readonly GenericAlly instance;
 
         public AllyAttackCheck(GenericAlly instance) : base(instance, 2, 3) {
             this.instance = instance;

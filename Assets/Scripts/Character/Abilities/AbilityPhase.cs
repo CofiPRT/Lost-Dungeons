@@ -58,6 +58,8 @@ namespace Character.Abilities {
                     OnManaDepletion();
                     return; // not enough mana
                 }
+
+                OnManaConsumption();
             }
 
             // the ability may receive another tick of update
@@ -77,6 +79,14 @@ namespace Character.Abilities {
         }
 
         protected virtual void OnManaDepletion() {
+            // intentionally blank
+        }
+
+        protected virtual void OnManaConsumption() {
+            // intentionally blank
+        }
+
+        protected internal virtual void OnAttack() {
             // intentionally blank
         }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Character.Implementation.Ally.AIChecks {
     public class AllyWanderCheck : GenericCharacter.BaseAICheck {
-        private new readonly GenericAlly instance;
+        private readonly GenericAlly instance;
 
         public AllyWanderCheck(GenericAlly instance) : base(instance, 5, 10) {
             this.instance = instance;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Character.Implementation.Ally.AIChecks {
     public class AllyFollowCheck : GenericCharacter.BaseAICheck {
-        private new readonly GenericAlly instance;
+        private readonly GenericAlly instance;
 
         public AllyFollowCheck(GenericAlly instance) : base(instance) {
             this.instance = instance;

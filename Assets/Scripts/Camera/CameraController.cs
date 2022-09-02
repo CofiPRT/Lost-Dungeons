@@ -16,6 +16,9 @@ namespace Camera {
                 Instance = this;
         }
 
+        public static Vector3 Pos => Instance.transform.position;
+        public static Vector2 Pos2D => new Vector3(Pos.x, Pos.z);
+
         public static Vector3 Forward => Instance.transform.forward;
         public static Vector2 Forward2D => new Vector2(Forward.x, Forward.z).normalized;
 

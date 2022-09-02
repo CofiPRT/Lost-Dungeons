@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Character.Misc;
+using UnityEngine;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        protected Vector2 LookDirection { get; set; }
+        protected internal Vector2 LookDirection { get; set; }
         protected bool IsRunning { get; set; }
 
         private Vector2 MovementApplication { get; set; }
@@ -11,15 +12,16 @@ namespace Character.Implementation.Base {
         private float Acceleration { get; }
         private float Deceleration { get; }
         private float RotationSpeed { get; }
-        private float MovementSpeedFactor => 1;
+        protected virtual float MovementSpeedFactor => 1;
 
         protected virtual bool CanApplyMovement => IsAlive && !IsStunned && !AttackBlocksMovement;
+        protected virtual bool MovementCanSyncLookDirection => !IsBlocking;
 
         public void ApplyMovement(Vector2 direction, bool run, bool syncLookDirection) {
             if (!CanApplyMovement || direction.magnitude == 0)
                 return;
 
-            if ((run || syncLookDirection) && !IsBlocking)
+            if ((run || syncLookDirection) && MovementCanSyncLookDirection)
                 LookDirection = direction;
 
             // compute the signed angle difference between the movement direction and the character's orientation

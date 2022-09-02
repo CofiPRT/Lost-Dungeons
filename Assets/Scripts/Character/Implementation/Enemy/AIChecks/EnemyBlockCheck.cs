@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Character.Implementation.Enemy.AIChecks {
     public class EnemyBlockCheck : GenericCharacter.BaseAICheck {
-        private new readonly GenericEnemy instance;
+        private readonly GenericEnemy instance;
 
         public EnemyBlockCheck(GenericEnemy instance) : base(instance, 2, 3) {
             this.instance = instance;

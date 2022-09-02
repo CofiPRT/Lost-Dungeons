@@ -1,4 +1,5 @@
-﻿using Properties;
+﻿using Character.Misc;
+using Properties;
 using UnityEngine;
 
 namespace Character.Implementation.Base {

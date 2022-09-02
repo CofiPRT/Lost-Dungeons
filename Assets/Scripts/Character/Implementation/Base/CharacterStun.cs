@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using Character.Misc;
+using UnityEngine;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
         private float StunDuration { get; set; }
         private bool IsStunned => StunDuration > 0;
 
-        protected virtual bool AttemptStun(float stunDuration, GenericCharacter source) {
+        public virtual bool AttemptStun(float stunDuration, GenericCharacter source) {
             if (!IsAlive || stunDuration <= 0) return false;
 
             StunDuration = stunDuration;

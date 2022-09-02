@@ -11,7 +11,7 @@ namespace Character.Implementation.Base {
         private Image healthBarFill;
 
         private void AwakeHealthBar() {
-            healthBarCanvas = GameController.InstantiateHealthBar(transform.parent);
+            healthBarCanvas = Instantiate(GameController.DefaultInstances.healthBar, transform.parent);
             healthBarFill = healthBarCanvas.transform.Find("Fill").GetComponent<Image>();
         }
 

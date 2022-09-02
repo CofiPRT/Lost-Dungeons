@@ -5,7 +5,7 @@ using Character.Implementation.Ally;
 using Character.Implementation.Enemy;
 using Random = UnityEngine.Random;
 
-namespace Character {
+namespace Character.Misc {
     public class FairFight : IComparable<FairFight> {
         private const int DefaultMaxFightingEnemies = 3;
 

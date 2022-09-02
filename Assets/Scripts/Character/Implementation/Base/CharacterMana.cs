@@ -17,8 +17,26 @@ namespace Character.Implementation.Base {
             return true;
         }
 
-        public void ReplenishMana(float amount) {
+        protected void ReplenishMana(float amount) {
             Mana = Mathf.Min(Mana + amount, MaxMana);
+        }
+
+        private float secondCounterMana;
+        
+        private void UpdateAutoManaGain() {
+            LastDamageTime += DeltaTime;
+
+            if (LastDamageTime < 5f || Mana >= 50f)
+                return;
+
+            // heal 1 mana every half second
+            secondCounterMana += DeltaTime;
+
+            if (secondCounterMana < 0.5f)
+                return;
+
+            secondCounterMana = 0;
+            ReplenishMana(1);
         }
     }
 }

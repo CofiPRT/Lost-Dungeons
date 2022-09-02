@@ -7,35 +7,43 @@ namespace Character.Abilities {
         GenericPlayer User { get; }
         void StartCooldown();
         void Update();
+        bool Use();
+        void Reset();
+        void OnAttack();
     }
 
     public abstract class Ability<T> : IAbility where T : IAbility {
         public GenericPlayer User { get; }
         private readonly float cooldown;
 
+        private readonly bool checkIfBlocked;
+
         protected AbilityPhase<T>[] phases = Array.Empty<AbilityPhase<T>>();
         protected AbilityPhase<T> finalPhase;
 
         private int currentPhase;
         private float currentCooldown;
-        private bool active;
+        protected bool active;
         private bool aborted;
 
-        protected Ability(GenericPlayer user, float cooldown) {
+        protected Ability(GenericPlayer user, float cooldown, bool checkIfBlocked = true) {
             User = user;
             this.cooldown = cooldown;
+            this.checkIfBlocked = checkIfBlocked;
         }
 
-        public bool Use() {
+        public virtual bool Use() {
             // if on cooldown, or another ability blocks this cast, don't start
-            if (currentCooldown > 0 || User.CastBlocksAbilityUsage)
+            if (currentCooldown > 0 || (checkIfBlocked && User.CastBlocksAbilityUsage))
                 return false;
 
             // if already active, offer a reactivation to the current phase
-            if (active)
+            if (active) {
                 phases[currentPhase].OnReactivation();
-            else
+            } else {
                 Reset();
+                active = true; // keep it active
+            }
 
             return true;
         }
@@ -71,16 +79,21 @@ namespace Character.Abilities {
             aborted = true;
         }
 
-        private void Reset() {
+        public void Reset() {
             currentCooldown = 0;
             currentPhase = 0;
             aborted = false;
-            active = true;
+            active = false;
 
             foreach (var phase in phases)
                 phase.Reset();
 
             finalPhase.Reset();
+        }
+
+        public void OnAttack() {
+            if (active)
+                phases[currentPhase].OnAttack();
         }
     }
 }

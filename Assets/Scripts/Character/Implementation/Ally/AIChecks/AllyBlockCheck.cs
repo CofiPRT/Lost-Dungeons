@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Character.Implementation.Ally.AIChecks {
     public class AllyBlockCheck : GenericCharacter.BaseAICheck {
-        private new readonly GenericAlly instance;
+        private readonly GenericAlly instance;
 
         public AllyBlockCheck(GenericAlly instance) : base(instance, 2, 3) {
             this.instance = instance;

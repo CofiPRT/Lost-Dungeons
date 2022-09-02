@@ -3,6 +3,7 @@ using Character.Implementation.Ally.AIChecks;
 using Character.Implementation.Base;
 using Character.Implementation.Enemy;
 using Character.Implementation.Player;
+using Character.Misc;
 using Game;
 
 namespace Character.Implementation.Ally {

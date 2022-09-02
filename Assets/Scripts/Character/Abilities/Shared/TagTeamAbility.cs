@@ -30,8 +30,10 @@ namespace Character.Abilities.Shared {
                 return false;
 
             // both characters need to have enough mana
-            if (!User.HasMana(SharedManaCost) || !GameController.OtherPlayer.HasMana(SharedManaCost))
+            if (!User.HasMana(SharedManaCost) || !GameController.OtherPlayer.HasMana(SharedManaCost)) {
+                Reset();
                 return false;
+            }
 
             // consume the mana for both characters, and allow the ability to execute
             User.UseMana(SharedManaCost);

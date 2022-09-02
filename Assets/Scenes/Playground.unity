@@ -322,7 +322,7 @@ RectTransform:
   - {fileID: 392398740}
   - {fileID: 635920199}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1259,87 +1259,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 721615667}
   m_CullTransparentMesh: 1
---- !u!1001 &855785003
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 100000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_Name
-      value: Bottle3
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 100002, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 100004, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 100006, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 100008, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 100010, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 6f5a29a25a6f28e409c320feb56ed11f, type: 3}
 --- !u!1 &874605735
 GameObject:
   m_ObjectHideFlags: 0
@@ -2067,6 +1986,7 @@ GameObject:
   - component: {fileID: 1717985290}
   - component: {fileID: 1717985289}
   - component: {fileID: 1717985291}
+  - component: {fileID: 1717985292}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2086,14 +2006,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e69f97494eee6644a4bc5dd6eb8bcdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultPlayer1: {fileID: 8836453197201595729, guid: 6a10f3155da093140920034d334b7a4d,
-    type: 3}
-  defaultPlayer2: {fileID: 7233630407055162274, guid: 6a8cd3c9e1ddfc0438ee8ea2cdf5a63b,
-    type: 3}
-  defaultEnemyWhite: {fileID: 8777885979052908187, guid: 6fea85b38e34ba346b0dc5c84fc4e887,
-    type: 3}
-  defaultHealthBar: {fileID: 8459761256327841955, guid: 8d33425d7a2a5394ba6dc22e7de6306c,
-    type: 3}
 --- !u!4 &1717985290
 Transform:
   m_ObjectHideFlags: 0
@@ -2120,6 +2032,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eef287cf1134cf5b1dfebcdc2b1d756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1717985292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717985288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3769d50c97c3423d98076b24c62df7c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tristian: {fileID: 8836453197201595729, guid: 6a10f3155da093140920034d334b7a4d,
+    type: 3}
+  reinald: {fileID: 7233630407055162274, guid: 6a8cd3c9e1ddfc0438ee8ea2cdf5a63b, type: 3}
+  enemyWhite: {fileID: 8777885979052908187, guid: 6fea85b38e34ba346b0dc5c84fc4e887,
+    type: 3}
+  vase: {fileID: 5396224910256196712, guid: 4fbb2359773d2b54588827bd288f2335, type: 3}
+  bottle: {fileID: 4196394995542361021, guid: ffb32b41e7353f9408c4ead96eaf77c0, type: 3}
+  cauldron: {fileID: 7606187234309984084, guid: 5a0be4a16f95e3f4684b5474e324b2f2,
+    type: 3}
+  inkwell: {fileID: 6557773267418765973, guid: ab2942b37195e8b47bafc309f4f0e350, type: 3}
+  cup: {fileID: 2522202789271272713, guid: ea73f62743ac1aa49a15c22a94414bb8, type: 3}
+  jar: {fileID: 673441852531244559, guid: 2d4b0c5aa69b24448ae13e80ca48fe30, type: 3}
+  healthBar: {fileID: 8459761256327841955, guid: 8d33425d7a2a5394ba6dc22e7de6306c,
+    type: 3}
+  decoy: {fileID: -9116699250514610549, guid: 32ab5cad4b88b61418868137d121c9a1, type: 3}
 --- !u!1 &1757654896
 GameObject:
   m_ObjectHideFlags: 0
@@ -2460,7 +2399,7 @@ Transform:
   - {fileID: 542508512}
   - {fileID: 874605736}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2114283754330233424
 GameObject:
