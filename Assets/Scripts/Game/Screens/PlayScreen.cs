@@ -1,4 +1,4 @@
-﻿using Camera;
+﻿using CameraScript;
 using UnityEngine;
 
 namespace Game.Screens {
@@ -16,6 +16,10 @@ namespace Game.Screens {
         private bool spaceHeldDown;
 
         public override void Update() {
+            // handle pause
+            if (Input.GetKeyDown(KeyCode.Escape))
+                GameController.PauseGame();
+
             // handle switch ability
             if (spaceCooldown == 0)
                 spaceTaps = 0;
@@ -65,13 +69,13 @@ namespace Game.Screens {
 
             if (!startedDodge) {
                 // handle abilities
-                if (Input.GetKey(KeyCode.Alpha1))
+                if (Input.GetKeyDown(KeyCode.Alpha1))
                     GameController.ControlledPlayer.Ability1.Use();
 
-                if (Input.GetKey(KeyCode.Alpha2))
+                if (Input.GetKeyDown(KeyCode.Alpha2))
                     GameController.ControlledPlayer.Ability2.Use();
 
-                if (Input.GetKey(KeyCode.Alpha3))
+                if (Input.GetKeyDown(KeyCode.Alpha3))
                     GameController.ControlledPlayer.Ultimate.Use();
 
                 var running = Input.GetKey(KeyCode.LeftShift);
@@ -106,6 +110,12 @@ namespace Game.Screens {
 
             if (Input.GetKeyDown(KeyCode.M))
                 GameController.SpawnDebugAlly();
+
+            if (Input.GetKeyDown(KeyCode.O))
+                GameController.DebugKillAllEnemies();
+
+            if (Input.GetKeyDown(KeyCode.I))
+                GameController.DebugToggleTurboGameTick();
         }
     }
 }

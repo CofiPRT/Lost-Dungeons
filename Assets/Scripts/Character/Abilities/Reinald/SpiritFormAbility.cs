@@ -1,4 +1,4 @@
-﻿using Camera;
+﻿using CameraScript;
 using Character.Implementation.Player;
 using Character.Misc;
 

@@ -2,7 +2,7 @@
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace Camera {
+namespace CameraScript {
     public class EffectsController : MonoBehaviour {
         // singleton
         private static EffectsController Instance { get; set; }

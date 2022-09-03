@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Camera;
+using CameraScript;
 using Character.Implementation.Player;
 using Character.Misc;
 using Game;
@@ -139,7 +139,8 @@ namespace Character.Abilities.Shared {
                 ability.User.CastBlocksAbilityUsage = false;
 
                 // also start the cooldown of the partner's ability
-                GameController.OtherPlayer.AbilityDodge.StartCooldown();
+                if (GameController.OtherPlayer != null)
+                    GameController.OtherPlayer.AbilityDodge.StartCooldown();
 
                 base.OnEnd();
             }

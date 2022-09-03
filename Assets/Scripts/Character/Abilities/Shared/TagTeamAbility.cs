@@ -1,5 +1,5 @@
-﻿using Camera;
-using Camera.HUD;
+﻿using CameraScript;
+using CameraScript.HUD;
 using Character.Implementation.Player;
 using Game;
 using UnityEngine;
@@ -29,6 +29,11 @@ namespace Character.Abilities.Shared {
         public bool Use(bool performPlayerChange) {
             if (!base.Use())
                 return false;
+
+            if (GameController.OtherPlayer == null) {
+                Reset();
+                return false;
+            }
 
             // both characters need to have enough mana
             if (!User.HasMana(SharedManaCost) || !GameController.OtherPlayer.HasMana(SharedManaCost)) {

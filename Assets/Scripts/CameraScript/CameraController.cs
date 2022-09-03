@@ -2,7 +2,7 @@ using System;
 using Game;
 using UnityEngine;
 
-namespace Camera {
+namespace CameraScript {
     public class CameraController : MonoBehaviour {
         private const double DistanceEqualsTolerance = 10e-3;
 
@@ -43,11 +43,14 @@ namespace Camera {
         public LayerMask collisionLayer;
         [Range(1.0f, 5.0f)] public float fovDivisionFactor = 3.41f; // used in clip point computation
 
-        private UnityEngine.Camera usedCamera;
+        private Camera usedCamera;
         private Vector2 rotation;
 
         private void Start() {
-            usedCamera = GetComponent<UnityEngine.Camera>();
+            usedCamera = GetComponent<Camera>();
+
+            var ownRotation = transform.rotation.eulerAngles;
+            rotation = new Vector2(ownRotation.y, ownRotation.x);
         }
 
         public void ApplyInput(float horizontal, float vertical) {
@@ -73,6 +76,8 @@ namespace Camera {
 
         private void PerformCollision() {
             var target = GameController.ControlledPlayer;
+            if (target == null)
+                return;
 
             var targetPos = target.transform.position + target.GetComponent<Rigidbody>().centerOfMass;
             var desiredPosition = targetPos - transform.forward * distanceFromTarget;

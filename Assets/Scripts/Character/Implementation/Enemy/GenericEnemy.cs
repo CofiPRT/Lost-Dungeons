@@ -4,6 +4,7 @@ using Character.Implementation.Ally;
 using Character.Implementation.Base;
 using Character.Implementation.Enemy.AIChecks;
 using Character.Misc;
+using Game;
 using Properties;
 using UnityEngine;
 
@@ -42,6 +43,10 @@ namespace Character.Implementation.Enemy {
         protected override void OnDeath() {
             base.OnDeath();
             FairFight?.Unsubscribe(this);
+        }
+
+        protected override void OnDestroy() {
+            GameController.AliveEnemies.Remove(this);
         }
 
         protected override void UpdateLookDirection() {

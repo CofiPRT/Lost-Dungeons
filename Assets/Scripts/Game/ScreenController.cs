@@ -4,11 +4,19 @@ using UnityEngine;
 
 namespace Game {
     public class ScreenController : MonoBehaviour {
-        private readonly Stack<GameScreen> screens = new Stack<GameScreen>();
+        // singleton
+        private static ScreenController Instance { get; set; }
 
         private void Awake() {
+            if (Instance != null && Instance != this)
+                Destroy(this);
+            else
+                Instance = this;
+
             screens.Push(new PlayScreen());
         }
+
+        private readonly Stack<GameScreen> screens = new Stack<GameScreen>();
 
         private void Update() {
             screens.Peek()?.Update();
@@ -16,6 +24,14 @@ namespace Game {
 
         private void LateUpdate() {
             screens.Peek()?.LateUpdate();
+        }
+
+        public static void AddScreen(GameScreen screen) {
+            Instance.screens.Push(screen);
+        }
+
+        public static void RemoveScreen() {
+            Instance.screens.Pop();
         }
     }
 }

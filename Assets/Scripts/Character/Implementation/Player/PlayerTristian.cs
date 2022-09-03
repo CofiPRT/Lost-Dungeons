@@ -15,7 +15,7 @@ namespace Character.Implementation.Player {
         protected override float AttackSpeed => base.AttackSpeed * (UltimateActive ? 1.5f : 1f);
         protected override bool CanUseRareFinisher => UltimateActive;
 
-        protected override float TakeDamage(float damage, GenericCharacter source = null) {
+        protected internal override float TakeDamage(float damage, GenericCharacter source = null) {
             // reduce incoming damage when in ultimate
             if (UltimateActive)
                 damage *= 0.75f;

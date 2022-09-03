@@ -1,5 +1,7 @@
 ﻿using System;
 using Character.Misc;
+using Game;
+using Properties;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
@@ -10,8 +12,9 @@ namespace Character.Implementation.Base {
         public bool CanTakeDamage { get; set; } = true;
         protected internal virtual bool IsDetectable => true;
         private float LastDamageTime { get; set; }
+        private bool CanAutoHeal => Team != Team.Enemy;
 
-        protected virtual float TakeDamage(float damage, GenericCharacter source = null) {
+        protected internal virtual float TakeDamage(float damage, GenericCharacter source = null) {
             if (!IsAlive || !CanTakeDamage)
                 return 0;
 
@@ -75,13 +78,21 @@ namespace Character.Implementation.Base {
 
             if (DeathTime < DefaultDecayTime) return;
 
+            OnDestroy();
             Destroy(gameObject);
             Destroy(healthBarCanvas.gameObject);
+        }
+
+        protected virtual void OnDestroy() {
+            // intentionally left blank
         }
 
         private float secondCounter;
 
         private void UpdateAutoHeal() {
+            if (!CanAutoHeal)
+                return;
+
             LastDamageTime += DeltaTime;
 
             if (LastDamageTime < 5f || Health >= 25f)

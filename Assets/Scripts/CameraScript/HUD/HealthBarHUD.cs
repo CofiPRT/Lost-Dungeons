@@ -3,7 +3,7 @@ using Game;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Camera.HUD {
+namespace CameraScript.HUD {
     public partial class HUDController {
         private const float LerpSpeed = 5f;
 
@@ -29,16 +29,18 @@ namespace Camera.HUD {
 
         private RectTransform OtherHUD => ControlledHUD == player1HUD ? player2HUD : player1HUD;
 
-        private void AwakeHealthBars() {
+        private void StartHealthBars() {
             // handle player1
             player1HUD = (RectTransform)transform.Find("Player1");
             player1HealthBar = player1HUD.transform.Find("Bars/HealthBar").GetComponent<Image>();
             player1ManaBar = player1HUD.transform.Find("Bars/ManaBar").GetComponent<Image>();
+            player1HUD.gameObject.SetActive(false);
 
             // handle player2
             player2HUD = (RectTransform)transform.Find("Player2");
             player2HealthBar = player2HUD.transform.Find("Bars/HealthBar").GetComponent<Image>();
             player2ManaBar = player2HUD.transform.Find("Bars/ManaBar").GetComponent<Image>();
+            player2HUD.gameObject.SetActive(false);
         }
 
         public static void LerpOtherSizeUp(float coefficient) {
@@ -65,31 +67,52 @@ namespace Camera.HUD {
             Instance.OtherHUD.anchoredPosition = Vector2.Lerp(PositionIntermediary, Position2, coefficient);
         }
 
+        private bool initialized;
+
         private void UpdateHealthBars() {
+            Instance.player1HUD.gameObject.SetActive(GameController.Player1 != null);
+            Instance.player2HUD.gameObject.SetActive(GameController.Player2 != null);
+
+            // ensure the HUD of the controlled player is at the top
+            if (!initialized && GameController.ControlledPlayer == GameController.Player2) {
+                Instance.player2HUD.anchoredPosition = Position1;
+                Instance.player2HUD.localScale = new Vector3(Scale1, Scale1, 1);
+
+                Instance.player1HUD.anchoredPosition = Position2;
+                Instance.player1HUD.localScale = new Vector3(Scale2, Scale2, 1);
+
+                initialized = true;
+            }
+
+
             // lerp players' health and mana bars
-            player1HealthBar.fillAmount = Mathf.Lerp(
-                player1HealthBar.fillAmount,
-                GameController.Player1.Health / GameController.Player1.MaxHealth,
-                Time.deltaTime * LerpSpeed
-            );
+            if (GameController.Player1 != null) {
+                player1HealthBar.fillAmount = Mathf.Lerp(
+                    player1HealthBar.fillAmount,
+                    GameController.Player1.Health / GameController.Player1.MaxHealth,
+                    Time.deltaTime * LerpSpeed
+                );
 
-            player1ManaBar.fillAmount = Mathf.Lerp(
-                player1ManaBar.fillAmount,
-                GameController.Player1.Mana / GameController.Player1.MaxMana,
-                Time.deltaTime * LerpSpeed
-            );
+                player1ManaBar.fillAmount = Mathf.Lerp(
+                    player1ManaBar.fillAmount,
+                    GameController.Player1.Mana / GameController.Player1.MaxMana,
+                    Time.deltaTime * LerpSpeed
+                );
+            }
 
-            player2HealthBar.fillAmount = Mathf.Lerp(
-                player2HealthBar.fillAmount,
-                GameController.Player2.Health / GameController.Player2.MaxHealth,
-                Time.deltaTime * LerpSpeed
-            );
+            if (GameController.Player2 != null) {
+                player2HealthBar.fillAmount = Mathf.Lerp(
+                    player2HealthBar.fillAmount,
+                    GameController.Player2.Health / GameController.Player2.MaxHealth,
+                    Time.deltaTime * LerpSpeed
+                );
 
-            player2ManaBar.fillAmount = Mathf.Lerp(
-                player2ManaBar.fillAmount,
-                GameController.Player2.Mana / GameController.Player2.MaxMana,
-                Time.deltaTime * LerpSpeed
-            );
+                player2ManaBar.fillAmount = Mathf.Lerp(
+                    player2ManaBar.fillAmount,
+                    GameController.Player2.Mana / GameController.Player2.MaxMana,
+                    Time.deltaTime * LerpSpeed
+                );
+            }
         }
     }
 }

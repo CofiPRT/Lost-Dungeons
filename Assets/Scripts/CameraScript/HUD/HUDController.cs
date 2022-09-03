@@ -1,8 +1,6 @@
-﻿using Game;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
-namespace Camera.HUD {
+namespace CameraScript.HUD {
     public partial class HUDController : MonoBehaviour {
         // singleton
         public static HUDController Instance { get; set; }
@@ -15,13 +13,19 @@ namespace Camera.HUD {
 
             Instance = this;
 
-            AwakeHealthBars();
             AwakeCooldown();
+            AwakeGameEndOverlay();
+            AwakePauseMenu();
+        }
+
+        private void Start() {
+            StartHealthBars();
         }
 
         private void Update() {
             UpdateHealthBars();
             UpdateCooldown();
+            UpdatePauseMenu();
         }
     }
 }

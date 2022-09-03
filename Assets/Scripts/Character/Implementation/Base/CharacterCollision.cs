@@ -43,7 +43,7 @@ namespace Character.Implementation.Base {
             var ray = new Ray(ownPos, direction);
 
             // if the raycast hit something, the enemy's vision is blocked
-            return Physics.Raycast(ray, out _, distance, LayerMask.GetMask("Terrain", "Barrier"));
+            return !Physics.Raycast(ray, out _, distance, LayerMask.GetMask("Terrain", "Barrier"));
         }
     }
 }

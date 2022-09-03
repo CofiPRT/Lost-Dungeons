@@ -1,9 +1,19 @@
-﻿using UnityEngine;
+﻿using Character.Implementation.Base.AIActions;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        public BaseAIAction AIAction { get; set; }
+        private BaseAIAction aiAction;
+
+        public BaseAIAction AIAction {
+            get => aiAction;
+            set {
+                if (aiAction is { interruptible: false })
+                    aiAction = value;
+            }
+        }
+
         protected BaseAICheck[] AIChecks { get; set; }
         private bool UseAI { get; set; }
 
@@ -26,6 +36,10 @@ namespace Character.Implementation.Base {
 
             // offer a game tick to the current action if any
             AIAction?.Tick();
+        }
+
+        public void ForceMoveTo(Vector2 target) {
+            AIAction = new AIMoveAction(this, target, interruptible: true);
         }
 
         public abstract class BaseAICheck {
@@ -55,13 +69,19 @@ namespace Character.Implementation.Base {
         public abstract class BaseAIAction {
             protected readonly GenericCharacter instance;
             private readonly float maxDuration;
+            internal readonly bool interruptible;
 
             private float duration;
             private bool started;
 
-            protected BaseAIAction(GenericCharacter instance, float maxDuration = Mathf.Infinity) {
+            protected BaseAIAction(
+                GenericCharacter instance,
+                float maxDuration = Mathf.Infinity,
+                bool interruptible = true
+            ) {
                 this.instance = instance;
                 this.maxDuration = maxDuration;
+                this.interruptible = interruptible;
             }
 
             public void Tick() {
@@ -86,7 +106,7 @@ namespace Character.Implementation.Base {
             }
 
             protected virtual void OnEnd() {
-                instance.AIAction = null;
+                instance.aiAction = null;
             }
         }
     }

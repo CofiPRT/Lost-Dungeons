@@ -1,5 +1,5 @@
-﻿using Camera;
-using Camera.HUD;
+﻿using CameraScript;
+using CameraScript.HUD;
 using Character.Implementation.Player;
 using Game;
 using UnityEngine;
@@ -25,6 +25,11 @@ namespace Character.Abilities.Shared {
         public new bool Use() {
             if (!base.Use())
                 return false;
+
+            if (GameController.OtherPlayer == null) {
+                Reset();
+                return false;
+            }
 
             otherUser = GameController.OtherPlayer;
 

@@ -9,7 +9,7 @@ namespace Character.Implementation.Enemy {
                 name = "Violet Enemy",
 
                 maxHealth = 150,
-                attackDamage = 40,
+                attackDamage = 15,
 
                 attackStrength = Properties.AttackStrength.Strong,
                 blockStrength = Properties.BlockStrength.Strong

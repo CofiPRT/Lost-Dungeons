@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Camera;
+using CameraScript;
 using Character.Abilities;
 using Character.Abilities.Shared;
 using Character.Implementation.Ally;
 using Character.Implementation.Base;
 using Character.Implementation.Enemy;
+using Game;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -175,6 +176,12 @@ namespace Character.Implementation.Player {
             base.StartAttack(direction);
 
             Ultimate.OnAttack();
+        }
+
+        protected override void OnDeath() {
+            base.OnDeath();
+
+            GameController.StartDeath(Name);
         }
     }
 }

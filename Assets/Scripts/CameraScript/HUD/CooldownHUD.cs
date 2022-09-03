@@ -4,7 +4,7 @@ using Character.Implementation.Player;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Camera.HUD {
+namespace CameraScript.HUD {
     public partial class HUDController {
         private CanvasGroup rootCanvasGroup; // control alpha of entire Cooldown HUD
 

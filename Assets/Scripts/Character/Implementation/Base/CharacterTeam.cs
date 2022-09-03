@@ -2,7 +2,7 @@
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        private string Name { get; }
+        protected string Name { get; }
         private Team Team { get; }
 
         protected virtual void OnKill(GenericCharacter target) {

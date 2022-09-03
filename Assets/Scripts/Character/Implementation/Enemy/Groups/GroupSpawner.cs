@@ -23,12 +23,13 @@ namespace Character.Implementation.Enemy.Groups {
             var rotationAngle = Mathf.PI * 2 / enemies.Count;
 
             foreach (var enemy in enemies) {
-                Object.Instantiate(
+                var spawnedEnemy = Object.Instantiate(
                     enemy,
                     position + direction3D + Vector3.up * 0.5f,
                     Quaternion.LookRotation(-direction3D),
                     GameController.SpawnContainer
                 );
+                GameController.AliveEnemies.Add(spawnedEnemy);
 
                 direction2D = Rotate(direction2D, rotationAngle);
                 direction3D = new Vector3(direction2D.x, 0, direction2D.y);

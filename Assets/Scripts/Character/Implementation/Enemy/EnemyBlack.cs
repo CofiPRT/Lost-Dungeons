@@ -11,21 +11,21 @@ namespace Character.Implementation.Enemy {
                 name = "Black Enemy",
 
                 maxHealth = 100,
-                attackDamage = 20,
+                attackDamage = 10,
 
                 attackStrength = Properties.AttackStrength.Strong,
                 blockStrength = Properties.BlockStrength.Medium
             };
         }
 
-        private bool hasSpawnedBackup = false;
+        private bool hasSpawnedBackup;
 
         private static readonly Vector2[] BackupSpawnPositions = {
             new Vector2(-1, -1),
             new Vector2(-1, 1)
         };
 
-        protected override float TakeDamage(float damage, GenericCharacter source = null) {
+        protected internal override float TakeDamage(float damage, GenericCharacter source = null) {
             var damageTaken = base.TakeDamage(damage, source);
 
             if (Health <= MaxHealth * 0.5f && !hasSpawnedBackup) {

@@ -1,4 +1,4 @@
-﻿using Camera;
+﻿using CameraScript;
 using Game;
 using Properties;
 using UnityEngine;
