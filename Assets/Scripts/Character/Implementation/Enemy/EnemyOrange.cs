@@ -1,17 +1,17 @@
 ﻿using Character.Implementation.Base;
 
 namespace Character.Implementation.Enemy {
-    public class EnemyWhite : GenericEnemy {
-        public EnemyWhite() : base(CreateData()) { }
+    public class EnemyOrange : GenericEnemy {
+        public EnemyOrange() : base(CreateData()) { }
 
         private static CharacterBuilder CreateData() {
             return new CharacterBuilder {
-                name = "White Enemy",
+                name = "Orange Enemy",
 
-                maxHealth = 25,
-                attackDamage = 5,
+                maxHealth = 50,
+                attackDamage = 10,
 
-                attackStrength = Properties.AttackStrength.Weak,
+                attackStrength = Properties.AttackStrength.Medium,
                 blockStrength = Properties.BlockStrength.Weak
             };
         }

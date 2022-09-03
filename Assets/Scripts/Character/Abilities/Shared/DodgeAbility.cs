@@ -15,7 +15,7 @@ namespace Character.Abilities.Shared {
         private Vector2 dashDirection;
         private bool dodged;
 
-        public DodgeAbility(GenericPlayer user) : base(user, Cooldown) {
+        public DodgeAbility(GenericPlayer user) : base(user, Cooldown, () => user.iconDodge) {
             phases = new AbilityPhase<DodgeAbility>[] {
                 new Phase1(this),
                 new Phase2(this),

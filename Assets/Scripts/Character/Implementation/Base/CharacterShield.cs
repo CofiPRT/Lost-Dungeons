@@ -6,10 +6,10 @@ namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
         private const float FailedBlockStunDuration = 2; // seconds
 
-        protected bool IsBlocking { get; private set; }
+        public bool IsBlocking { get; private set; }
         private float ShieldAngle { get; }
-        private float ShieldRechargeTime { get; }
-        private float ShieldCooldown { get; set; }
+        public float ShieldRechargeTime { get; }
+        public float ShieldCooldown { get; private set; }
         private BlockStrength BlockStrength { get; }
 
         private float AttemptBlock(float damage, AttackStrength attackStrength, GenericCharacter source) {

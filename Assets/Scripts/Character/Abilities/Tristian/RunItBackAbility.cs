@@ -10,7 +10,7 @@ namespace Character.Abilities.Tristian {
 
         private GenericDecoy decoy;
 
-        public RunItBackAbility(GenericPlayer user) : base(user, Cooldown) {
+        public RunItBackAbility(GenericPlayer user) : base(user, Cooldown, () => user.iconAbility2) {
             phases = new AbilityPhase<RunItBackAbility>[] {
                 new Phase1(this),
                 new Phase2(this),
@@ -20,7 +20,7 @@ namespace Character.Abilities.Tristian {
         }
 
         public override bool Use() {
-            var recast = active;
+            var recast = Active;
 
             if (!base.Use())
                 return false;
@@ -60,7 +60,7 @@ namespace Character.Abilities.Tristian {
                     GameController.DefaultInstances.decoy,
                     ability.User.Pos,
                     userTransform.rotation,
-                    userTransform.parent
+                    GameController.SpawnContainer
                 );
 
                 // ensure the decoy spawns invisible

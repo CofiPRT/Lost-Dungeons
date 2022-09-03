@@ -9,7 +9,7 @@ namespace Character.Abilities.Reinald {
 
         private GenericEnemy target;
 
-        public BehindYouAbility(GenericPlayer user) : base(user, Cooldown) {
+        public BehindYouAbility(GenericPlayer user) : base(user, Cooldown, () => user.iconAbility2) {
             phases = new AbilityPhase<BehindYouAbility>[] {
                 new Phase1(this),
                 new Phase2(this),

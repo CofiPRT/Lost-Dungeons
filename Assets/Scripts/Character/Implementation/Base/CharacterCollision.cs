@@ -8,6 +8,8 @@ namespace Character.Implementation.Base {
         public bool IgnoreCollisions { get; set; }
 
         public Vector3 CenterOfMass => RigidBody.worldCenterOfMass;
+        private Vector3 ColliderYTop => Collider.bounds.center + Vector3.up * Collider.bounds.extents.y;
+        public Vector3 EyePosition => Vector3.Lerp(CenterOfMass, ColliderYTop, 0.8f);
 
         private int CollisionLayers { get; set; }
         private readonly List<Collider> ignoredColliders = new List<Collider>();
@@ -30,6 +32,18 @@ namespace Character.Implementation.Base {
             RigidBody = GetComponent<Rigidbody>();
             Collider = GetComponent<Collider>();
             CollisionLayers = LayerMask.GetMask(Properties.TeamUtils.AllLayers);
+        }
+
+        public bool CanSee(GenericCharacter opponent) {
+            // raycast from the enemy to the fighting opponent, testing for terrain and barriers
+            var ownPos = EyePosition;
+            var opponentPos = opponent.EyePosition;
+            var direction = opponentPos - ownPos;
+            var distance = direction.magnitude;
+            var ray = new Ray(ownPos, direction);
+
+            // if the raycast hit something, the enemy's vision is blocked
+            return Physics.Raycast(ray, out _, distance, LayerMask.GetMask("Terrain", "Barrier"));
         }
     }
 }

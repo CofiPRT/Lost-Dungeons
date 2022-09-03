@@ -1,20 +1,32 @@
 ﻿using System;
 using Character.Implementation.Player;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Character.Abilities {
     public interface IAbility {
+        SpriteGetter IconGetter { get; }
         GenericPlayer User { get; }
+        float CooldownTime { get; }
+        float CurrentCooldown { get; }
+        bool Active { get; }
+
         void StartCooldown();
         void Update();
         bool Use();
         void Reset();
         void OnAttack();
+
+        public delegate Sprite SpriteGetter();
     }
 
     public abstract class Ability<T> : IAbility where T : IAbility {
+        public IAbility.SpriteGetter IconGetter { get; }
         public GenericPlayer User { get; }
-        private readonly float cooldown;
+
+        public float CooldownTime { get; }
+        public float CurrentCooldown { get; private set; }
+        public bool Active { get; private set; }
 
         private readonly bool checkIfBlocked;
 
@@ -22,37 +34,41 @@ namespace Character.Abilities {
         protected AbilityPhase<T> finalPhase;
 
         private int currentPhase;
-        private float currentCooldown;
-        protected bool active;
         private bool aborted;
 
-        protected Ability(GenericPlayer user, float cooldown, bool checkIfBlocked = true) {
+        protected Ability(
+            GenericPlayer user,
+            float cooldown,
+            IAbility.SpriteGetter iconGetter,
+            bool checkIfBlocked = true
+        ) {
             User = user;
-            this.cooldown = cooldown;
+            IconGetter = iconGetter;
+            CooldownTime = cooldown;
             this.checkIfBlocked = checkIfBlocked;
         }
 
         public virtual bool Use() {
             // if on cooldown, or another ability blocks this cast, don't start
-            if (currentCooldown > 0 || (checkIfBlocked && User.CastBlocksAbilityUsage))
+            if (CurrentCooldown > 0 || (checkIfBlocked && User.CastBlocksAbilityUsage))
                 return false;
 
             // if already active, offer a reactivation to the current phase
-            if (active) {
+            if (Active) {
                 phases[currentPhase].OnReactivation();
             } else {
                 Reset();
-                active = true; // keep it active
+                Active = true; // keep it active
             }
 
             return true;
         }
 
         public void Update() {
-            currentCooldown = Mathf.Max(0, currentCooldown - User.DeltaTime);
+            CurrentCooldown = Mathf.Max(0, CurrentCooldown - User.DeltaTime);
 
             // only update while active
-            if (!active)
+            if (!Active)
                 return;
 
             // if we've run through all the phases, or the ability has been aborted, end it
@@ -71,8 +87,8 @@ namespace Character.Abilities {
         }
 
         public void StartCooldown() {
-            active = false;
-            currentCooldown = cooldown;
+            Active = false;
+            CurrentCooldown = CooldownTime;
         }
 
         internal void Abort() {
@@ -80,10 +96,10 @@ namespace Character.Abilities {
         }
 
         public void Reset() {
-            currentCooldown = 0;
+            CurrentCooldown = 0;
             currentPhase = 0;
             aborted = false;
-            active = false;
+            Active = false;
 
             foreach (var phase in phases)
                 phase.Reset();
@@ -92,7 +108,7 @@ namespace Character.Abilities {
         }
 
         public void OnAttack() {
-            if (active)
+            if (Active)
                 phases[currentPhase].OnAttack();
         }
     }

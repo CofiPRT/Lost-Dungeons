@@ -1,4 +1,5 @@
 ﻿using Camera;
+using Camera.HUD;
 using Character.Implementation.Player;
 using Game;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace Character.Abilities.Shared {
 
         private GenericPlayer otherUser;
 
-        public SwitchAbility(GenericPlayer user) : base(user, Cooldown) {
+        public SwitchAbility(GenericPlayer user) : base(user, Cooldown, null) {
             phases = new AbilityPhase<SwitchAbility>[] {
                 new Phase1(this),
                 new Phase2(this),
@@ -54,6 +55,7 @@ namespace Character.Abilities.Shared {
                 GameController.GameTickSpeed = Mathf.Lerp(1.0f, GameTickSpeed, Coefficient);
                 EffectsController.Lerp(Coefficient, true, false);
                 HUDController.LerpOtherSizeUp(Coefficient);
+                HUDController.LerpTransparency(1 - Coefficient);
             }
 
             protected override void OnEnd() {
@@ -61,6 +63,7 @@ namespace Character.Abilities.Shared {
                 GameController.GameTickSpeed = GameTickSpeed;
                 EffectsController.Lerp(1.0f, true, false);
                 HUDController.LerpOtherSizeUp(1.0f);
+                HUDController.LerpTransparency(0.0f);
             }
         }
 
@@ -102,6 +105,7 @@ namespace Character.Abilities.Shared {
                 GameController.GameTickSpeed = Mathf.Lerp(GameTickSpeed, 1.0f, Coefficient);
                 EffectsController.Lerp(1 - Coefficient, true, false);
                 HUDController.LerpOtherSizeDown(Coefficient);
+                HUDController.LerpTransparency(Coefficient);
             }
 
             protected override void OnEnd() {
@@ -109,6 +113,7 @@ namespace Character.Abilities.Shared {
                 GameController.GameTickSpeed = 1.0f;
                 EffectsController.ResetEffects();
                 HUDController.LerpOtherSizeDown(1.0f);
+                HUDController.LerpTransparency(1.0f);
 
                 // also start the cooldown of the partner's ability
                 ability.otherUser.AbilitySwitch.StartCooldown();

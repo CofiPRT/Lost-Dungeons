@@ -41,6 +41,9 @@ namespace Character.Implementation.Base {
         public Vector3 Forward => transform.forward;
         public Vector2 Forward2D => new Vector2(Forward.x, Forward.z).normalized;
 
+        public Vector3 Right => transform.right;
+        public Vector2 Right2D => new Vector2(Right.x, Right.z).normalized;
+
         protected virtual void Awake() {
             AwakeAnimator();
             AwakeCollider();

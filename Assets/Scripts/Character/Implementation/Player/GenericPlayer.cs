@@ -8,6 +8,7 @@ using Character.Implementation.Ally;
 using Character.Implementation.Base;
 using Character.Implementation.Enemy;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Character.Implementation.Player {
     public abstract class GenericPlayer : GenericAlly {
@@ -41,6 +42,15 @@ namespace Character.Implementation.Player {
         public IAbility Ultimate { get; protected set; }
 
         protected bool UltimateActive { get; private set; }
+
+        /* Ability Icons - To set in the inspector */
+
+        public Sprite iconShield;
+        public Sprite iconDodge;
+        public Sprite iconTagTeam;
+        public Sprite iconAbility1;
+        public Sprite iconAbility2;
+        public Sprite iconUltimate;
 
         /* Ability Logic */
 

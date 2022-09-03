@@ -1,31 +1,10 @@
-﻿using Game;
+﻿using Character.Implementation.Player;
+using Game;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Camera {
-    public class HUDController : MonoBehaviour {
-        // singleton
-        private static HUDController Instance { get; set; }
-
-        private void Awake() {
-            if (Instance != null && Instance != this) {
-                Destroy(this);
-                return;
-            }
-
-            Instance = this;
-
-            // handle player1
-            player1HUD = (RectTransform)transform.Find("Player1");
-            player1HealthBar = player1HUD.transform.Find("Bars/HealthBar").GetComponent<Image>();
-            player1ManaBar = player1HUD.transform.Find("Bars/ManaBar").GetComponent<Image>();
-
-            // handle player2
-            player2HUD = (RectTransform)transform.Find("Player2");
-            player2HealthBar = player2HUD.transform.Find("Bars/HealthBar").GetComponent<Image>();
-            player2ManaBar = player2HUD.transform.Find("Bars/ManaBar").GetComponent<Image>();
-        }
-
+namespace Camera.HUD {
+    public partial class HUDController {
         private const float LerpSpeed = 5f;
 
         private static readonly Vector2 Position1 = new Vector2(0, -140);
@@ -37,18 +16,30 @@ namespace Camera {
 
         private RectTransform player1HUD;
         private RectTransform player2HUD;
-
         private Image player1HealthBar;
         private Image player2HealthBar;
-
         private Image player1ManaBar;
         private Image player2ManaBar;
 
-        private RectTransform ControlledHUD => GameController.ControlledPlayer == GameController.Player1
+        private static GenericPlayer Player => GameController.ControlledPlayer;
+
+        private RectTransform ControlledHUD => Player == GameController.Player1
             ? player1HUD
             : player2HUD;
 
         private RectTransform OtherHUD => ControlledHUD == player1HUD ? player2HUD : player1HUD;
+
+        private void AwakeHealthBars() {
+            // handle player1
+            player1HUD = (RectTransform)transform.Find("Player1");
+            player1HealthBar = player1HUD.transform.Find("Bars/HealthBar").GetComponent<Image>();
+            player1ManaBar = player1HUD.transform.Find("Bars/ManaBar").GetComponent<Image>();
+
+            // handle player2
+            player2HUD = (RectTransform)transform.Find("Player2");
+            player2HealthBar = player2HUD.transform.Find("Bars/HealthBar").GetComponent<Image>();
+            player2ManaBar = player2HUD.transform.Find("Bars/ManaBar").GetComponent<Image>();
+        }
 
         public static void LerpOtherSizeUp(float coefficient) {
             var scale = Mathf.Lerp(Scale2, Scale1, coefficient);
@@ -74,7 +65,7 @@ namespace Camera {
             Instance.OtherHUD.anchoredPosition = Vector2.Lerp(PositionIntermediary, Position2, coefficient);
         }
 
-        private void Update() {
+        private void UpdateHealthBars() {
             // lerp players' health and mana bars
             player1HealthBar.fillAmount = Mathf.Lerp(
                 player1HealthBar.fillAmount,

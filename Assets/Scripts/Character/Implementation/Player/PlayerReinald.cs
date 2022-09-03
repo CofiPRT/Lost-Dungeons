@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Character.Implementation.Player {
     public class PlayerReinald : GenericPlayer {
-        public PlayerReinald() : base("Reinald", Color.blue) {
+        public PlayerReinald() : base("Reinald", Color.cyan) {
             Ability1 = new NaturesTricksAbility(this);
             Ability2 = new BehindYouAbility(this);
             Ultimate = new SpiritFormAbility(this);

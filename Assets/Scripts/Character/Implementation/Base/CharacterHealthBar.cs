@@ -1,5 +1,6 @@
 ﻿using Camera;
 using Game;
+using Properties;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +12,10 @@ namespace Character.Implementation.Base {
         private Image healthBarFill;
 
         private void AwakeHealthBar() {
-            healthBarCanvas = Instantiate(GameController.DefaultInstances.healthBar, transform.parent);
+            var instance = Team == Team.Enemy
+                ? GameController.DefaultInstances.redHealthBar
+                : GameController.DefaultInstances.greenHealthBar;
+            healthBarCanvas = Instantiate(instance, GameController.SpawnContainer);
             healthBarFill = healthBarCanvas.transform.Find("Fill").GetComponent<Image>();
         }
 

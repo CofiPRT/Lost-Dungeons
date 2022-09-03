@@ -1,6 +1,5 @@
 ﻿using Character.Implementation.Base;
 using Character.Implementation.Base.AIActions;
-using UnityEngine;
 
 namespace Character.Implementation.Enemy.AIChecks {
     public class EnemyAttackCheck : GenericCharacter.BaseAICheck {

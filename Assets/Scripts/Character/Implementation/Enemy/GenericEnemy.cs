@@ -18,7 +18,8 @@ namespace Character.Implementation.Enemy {
                 new EnemyRangeCheck(this),
                 new EnemyAttackCheck(this),
                 new EnemyBlockCheck(this),
-                new EnemyWanderCheck(this)
+                new EnemyWanderCheck(this),
+                new EnemyVisionCheck(this)
             };
         }
 
@@ -32,7 +33,7 @@ namespace Character.Implementation.Enemy {
                     LayerMask.GetMask(AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
                 )
                 .Select(x => x.GetComponent<GenericAlly>())
-                .Where(x => x != null && x.IsAlive && x.IsDetectable)
+                .Where(x => x != null && CanSee(x) && x.IsAlive && x.IsDetectable)
                 .ToList();
         }
 

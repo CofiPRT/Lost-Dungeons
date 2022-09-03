@@ -1,3 +1,4 @@
+using Camera.HUD;
 using Character.Implementation.Player;
 using UnityEngine;
 
@@ -13,11 +14,14 @@ namespace Game {
                 Instance = this;
 
             defaultInstances = GetComponent<Instances>();
+            spawnContainer = transform.Find("SpawnContainer").transform;
         }
 
         private Instances defaultInstances;
+        private Transform spawnContainer;
 
         public static Instances DefaultInstances => Instance.defaultInstances;
+        public static Transform SpawnContainer => Instance.spawnContainer;
 
         /* game data */
 
@@ -48,8 +52,8 @@ namespace Game {
         }
 
         private void Start() {
-            player1 = Instantiate(defaultInstances.tristian, new Vector3(0, 1, 0), Quaternion.identity);
-            player2 = Instantiate(defaultInstances.reinald, new Vector3(1, 0, 0), Quaternion.identity);
+            player1 = Instantiate(defaultInstances.tristian, new Vector3(0, 10, 0), Quaternion.identity);
+            player2 = Instantiate(defaultInstances.reinald, new Vector3(1, 10, 0), Quaternion.identity);
 
             controlledPlayer = player1;
             controlledPlayer.SetAI(false);
@@ -63,13 +67,16 @@ namespace Game {
             Instance.controlledPlayer =
                 Instance.controlledPlayer == Instance.player1 ? Instance.player2 : Instance.player1;
             Instance.controlledPlayer.SetAI(false);
+
+            HUDController.RefreshIcons();
         }
 
         public static void SpawnDebugEnemy() {
             Instantiate(
                 DefaultInstances.enemyWhite,
                 ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
-                Quaternion.identity
+                Quaternion.identity,
+                SpawnContainer
             );
         }
 
@@ -77,7 +84,17 @@ namespace Game {
             Instantiate(
                 DefaultInstances.bottle,
                 ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
-                Quaternion.identity
+                Quaternion.identity,
+                SpawnContainer
+            );
+        }
+
+        public static void SpawnDebugAlly() {
+            Instantiate(
+                DefaultInstances.ally,
+                ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
+                Quaternion.identity,
+                SpawnContainer
             );
         }
     }

@@ -7,7 +7,7 @@ namespace Character.Abilities.Tristian {
         private const float Cooldown = 30f;
         private const float ManaCost = 25f;
 
-        public BerserkAbility(GenericPlayer user) : base(user, Cooldown, false) {
+        public BerserkAbility(GenericPlayer user) : base(user, Cooldown, () => user.iconUltimate, false) {
             phases = new AbilityPhase<BerserkAbility>[] {
                 new Phase1(this),
                 new Phase2(this),
@@ -17,7 +17,7 @@ namespace Character.Abilities.Tristian {
         }
 
         public override bool Use() {
-            var recast = active;
+            var recast = Active;
 
             if (!base.Use())
                 return false;

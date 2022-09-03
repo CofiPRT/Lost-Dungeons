@@ -12,7 +12,7 @@ namespace Character.Abilities.Tristian {
         private GenericProp prop;
         private GenericEnemy target;
 
-        public NaturesMightAbility(GenericPlayer user) : base(user, Cooldown) {
+        public NaturesMightAbility(GenericPlayer user) : base(user, Cooldown, () => user.iconAbility1) {
             phases = new AbilityPhase<NaturesMightAbility>[] {
                 new Phase1(this),
                 new Phase2(this),

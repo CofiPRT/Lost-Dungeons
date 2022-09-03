@@ -12,7 +12,7 @@ namespace Character.Abilities.Reinald {
         private GenericProp prop;
         private GenericEnemy target;
 
-        public NaturesTricksAbility(GenericPlayer user) : base(user, Cooldown) {
+        public NaturesTricksAbility(GenericPlayer user) : base(user, Cooldown, () => user.iconAbility1) {
             phases = new AbilityPhase<NaturesTricksAbility>[] {
                 new Phase1(this)
             };

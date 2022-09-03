@@ -1,4 +1,5 @@
 ﻿using Camera;
+using Camera.HUD;
 using Character.Implementation.Player;
 using Game;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace Character.Abilities.Shared {
         private bool changePlayers;
         private GenericPlayer otherUser;
 
-        public TagTeamAbility(GenericPlayer user) : base(user, Cooldown) {
+        public TagTeamAbility(GenericPlayer user) : base(user, Cooldown, () => user.iconTagTeam) {
             phases = new AbilityPhase<TagTeamAbility>[] {
                 new Phase1(this),
                 new Phase2(this),
@@ -72,16 +73,21 @@ namespace Character.Abilities.Shared {
                 EffectsController.Lerp(Coefficient, true, false);
 
                 // lerp HUD if necessary
-                if (ability.changePlayers)
+                if (ability.changePlayers) {
                     HUDController.LerpOtherSizeUp(Coefficient);
+                    HUDController.LerpTransparency(1 - Coefficient);
+                }
             }
 
             protected override void OnEnd() {
                 // ensure lerps are finished
                 GameController.GameTickSpeed = GameTickSpeed;
                 EffectsController.Lerp(1.0f, true, false);
-                if (ability.changePlayers)
+
+                if (ability.changePlayers) {
                     HUDController.LerpOtherSizeUp(1.0f);
+                    HUDController.LerpTransparency(0.0f);
+                }
             }
         }
 
@@ -170,8 +176,10 @@ namespace Character.Abilities.Shared {
                 EffectsController.Lerp(1 - Coefficient, true, false);
 
                 // lerp HUD back if necessary
-                if (ability.changePlayers)
+                if (ability.changePlayers) {
                     HUDController.LerpOtherSizeDown(Coefficient);
+                    HUDController.LerpTransparency(Coefficient);
+                }
             }
 
             protected override void OnEnd() {
@@ -179,8 +187,10 @@ namespace Character.Abilities.Shared {
                 GameController.GameTickSpeed = 1.0f;
                 EffectsController.ResetEffects();
 
-                if (ability.changePlayers)
+                if (ability.changePlayers) {
                     HUDController.LerpOtherSizeDown(1.0f);
+                    HUDController.LerpTransparency(1.0f);
+                }
 
                 // also start the cooldown of the partner's ability
                 ability.otherUser.AbilityTagTeam.StartCooldown();

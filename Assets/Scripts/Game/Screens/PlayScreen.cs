@@ -103,6 +103,9 @@ namespace Game.Screens {
 
             if (Input.GetKeyDown(KeyCode.L))
                 GameController.SpawnDebugProp();
+
+            if (Input.GetKeyDown(KeyCode.M))
+                GameController.SpawnDebugAlly();
         }
     }
 }
