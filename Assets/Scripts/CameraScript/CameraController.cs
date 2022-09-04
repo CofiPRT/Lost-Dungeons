@@ -16,6 +16,8 @@ namespace CameraScript {
                 Instance = this;
         }
 
+        /* Properties */
+
         public static Vector3 Pos => Instance.transform.position;
         public static Vector2 Pos2D => new Vector3(Pos.x, Pos.z);
 
@@ -25,6 +27,8 @@ namespace CameraScript {
         public static Vector3 Right => Instance.transform.right;
         public static Vector2 Right2D => new Vector2(Right.x, Right.z).normalized;
 
+        /* Inspector */
+
         [Range(0.1f, 20.0f)] public float smoothSpeed = 10f; // for lerping
 
         public float heightFromTarget;
@@ -33,24 +37,42 @@ namespace CameraScript {
         [Range(0.1f, 10.0f)] public float horizontalSensitivity = 1.0f;
         [Range(0.1f, 10.0f)] public float verticalSensitivity = 1.0f;
 
-        public bool canRotate = true;
         public bool invertY;
+        public bool canRotate = true;
+        public bool followPlayer = true;
+        public Vector3 customTarget;
+        public Vector3 customForward;
 
         [Range(-90.0f, 0.0f)] public float minYAngle = -45.0f;
         [Range(0.0f, 90.0f)] public float maxYAngle = 45.0f;
 
-        // COLLISION - RELATED
+        /* Collisions */
+
         public LayerMask collisionLayer;
         [Range(1.0f, 5.0f)] public float fovDivisionFactor = 3.41f; // used in clip point computation
 
+        /* Logic */
+
         private Camera usedCamera;
         private Vector2 rotation;
+
+        public static Camera Cam => Instance.usedCamera;
 
         private void Start() {
             usedCamera = GetComponent<Camera>();
 
             var ownRotation = transform.rotation.eulerAngles;
             rotation = new Vector2(ownRotation.y, ownRotation.x);
+        }
+
+        private void Update() {
+            var desiredRotation = followPlayer
+                ? Quaternion.Euler(rotation.y, rotation.x, 0)
+                : Quaternion.LookRotation(customForward);
+
+            transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, smoothSpeed * Time.deltaTime);
+
+            PerformCollision();
         }
 
         public void ApplyInput(float horizontal, float vertical) {
@@ -66,22 +88,25 @@ namespace CameraScript {
             rotation.x = Mathf.Repeat(rotation.x, 360);
             rotation.y = Mathf.Clamp(rotation.y, minYAngle, maxYAngle);
 
-            var desiredRotation = Quaternion.Euler(rotation.y, rotation.x, 0);
-
-            // smooth lerping
-            transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, smoothSpeed * Time.deltaTime);
-
             PerformCollision();
         }
 
         private void PerformCollision() {
-            var target = GameController.ControlledPlayer;
-            if (target == null)
-                return;
+            Vector3 targetPos;
+            Vector3 desiredPosition;
 
-            var targetPos = target.transform.position + target.GetComponent<Rigidbody>().centerOfMass;
-            var desiredPosition = targetPos - transform.forward * distanceFromTarget;
-            desiredPosition += new Vector3(0, heightFromTarget, 0);
+            if (followPlayer) {
+                var target = GameController.ControlledPlayer;
+                if (target == null)
+                    return;
+
+                targetPos = target.transform.position + target.GetComponent<Rigidbody>().centerOfMass;
+                desiredPosition = targetPos - transform.forward * distanceFromTarget;
+                desiredPosition += new Vector3(0, heightFromTarget, 0);
+            } else {
+                desiredPosition = customTarget;
+                targetPos = customTarget;
+            }
 
             // compute offsets for every axis
             var z = usedCamera.nearClipPlane;
@@ -119,6 +144,16 @@ namespace CameraScript {
 
             // perform smooth lerping
             transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+        }
+
+        public static void SetCustomTarget(Vector3 target, Vector3 forward) {
+            Instance.customTarget = target;
+            Instance.customForward = forward;
+            Instance.followPlayer = false;
+        }
+
+        public static void SetFollowPlayer() {
+            Instance.followPlayer = true;
         }
     }
 }

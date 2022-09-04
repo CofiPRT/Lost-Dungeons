@@ -70,25 +70,32 @@ namespace Game {
 
         public static void SetPlayer1(GenericPlayer player) {
             Instance.player1 = player;
-            Instance.player1.SetAI(false);
             Instance.player1.HideHealthBar();
-            Instance.controlledPlayer = Instance.player1;
 
-            if (Instance.player2 != null)
-                Instance.player2.SetAI(true);
-
-            HUDController.RefreshIcons();
+            if (Instance.player2 != null) // set a random player as the controlled player
+                SetControlledPlayer(Random.value > 0.5f ? Instance.player1 : Instance.player2);
+            else
+                SetControlledPlayer(Instance.player1);
         }
 
         public static void SetPlayer2(GenericPlayer player) {
             Instance.player2 = player;
             Instance.player2.SetAI(false);
             Instance.player2.HideHealthBar();
-            Instance.controlledPlayer = Instance.player2;
 
-            if (Instance.player1 != null)
-                Instance.player1.SetAI(true);
-
+            if (Instance.player1 != null) // set a random player as the controlled player
+                SetControlledPlayer(Random.value > 0.5f ? Instance.player1 : Instance.player2);
+            else
+                SetControlledPlayer(Instance.player2);
+        }
+        
+        private static void SetControlledPlayer(GenericPlayer player) {
+            Instance.controlledPlayer = player;
+            Instance.controlledPlayer.SetAI(false);
+            
+            if (OtherPlayer != null)
+                OtherPlayer.SetAI(true);
+            
             HUDController.RefreshIcons();
         }
 
@@ -96,12 +103,7 @@ namespace Game {
             if (OtherPlayer == null)
                 return;
 
-            Instance.controlledPlayer.SetAI(true);
-            Instance.controlledPlayer =
-                Instance.controlledPlayer == Instance.player1 ? Instance.player2 : Instance.player1;
-            Instance.controlledPlayer.SetAI(false);
-
-            HUDController.RefreshIcons();
+            SetControlledPlayer(OtherPlayer);
         }
 
         public static void PauseGame() {
@@ -111,16 +113,24 @@ namespace Game {
             ScreenController.AddScreen(new PauseScreen());
             HUDController.Pause();
 
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
+            ShowCursor();
         }
 
         public static void ResumeGame() {
             GameTickSpeed = Instance.prePauseTickSpeed;
             ScreenController.RemoveScreen();
 
+            HideCursor();
+        }
+
+        public static void ShowCursor() {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+
+        public static void HideCursor(bool center = true) {
             Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.lockState = center ? CursorLockMode.Locked : CursorLockMode.Confined;
         }
 
         public static bool AttemptFinish() {

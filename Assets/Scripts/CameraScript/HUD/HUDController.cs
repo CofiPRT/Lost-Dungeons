@@ -3,7 +3,7 @@
 namespace CameraScript.HUD {
     public partial class HUDController : MonoBehaviour {
         // singleton
-        public static HUDController Instance { get; set; }
+        private static HUDController Instance { get; set; }
 
         private void Awake() {
             if (Instance != null && Instance != this) {

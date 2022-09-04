@@ -12,8 +12,8 @@ namespace Character.Implementation.Base.AIActions {
             bool run = true,
             bool syncLookDirection = true,
             float maxDuration = 5,
-            bool interruptible = true
-        ) : base(instance, maxDuration, interruptible) {
+            int priority = 2
+        ) : base(instance, priority, maxDuration) {
             this.destination = destination;
             this.run = run;
             this.syncLookDirection = syncLookDirection;

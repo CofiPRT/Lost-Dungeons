@@ -14,14 +14,16 @@ namespace Character.Implementation.Ally.AIChecks {
             if (instance.FairFight.InFight)
                 return; // only wander when not in a fight
 
-            var distToLeader = Vector2.Distance(instance.Leader.Pos2D, instance.Pos2D);
-            if (distToLeader > 5)
+            var targetPos = instance.DefendPosition2D ?? instance.Leader.Pos2D;
+
+            var distToTarget = Vector2.Distance(targetPos, instance.Pos2D);
+            if (distToTarget > 5)
                 return; // this should be handled by AllyFollowCheck
 
             var randomAngle = Random.Range(0, Mathf.PI * 2);
             var randomDistance = Random.Range(3, 5);
 
-            var destination = instance.Leader.Pos2D + new Vector2(
+            var destination = targetPos + new Vector2(
                 randomDistance * Mathf.Cos(randomAngle),
                 randomDistance * Mathf.Sin(randomAngle)
             );

@@ -5,6 +5,7 @@ using Character.Implementation.Enemy;
 using Character.Implementation.Player;
 using Character.Misc;
 using Game;
+using UnityEngine;
 
 namespace Character.Implementation.Ally {
     public abstract class GenericAlly : GenericCharacter, IComparable<GenericAlly> {
@@ -15,18 +16,38 @@ namespace Character.Implementation.Ally {
                 new AllyAttackCheck(this),
                 new AllyBlockCheck(this),
                 new AllyWanderCheck(this),
-                new AllyTeamUpCheck(this)
+                new AllyTeamUpCheck(this),
+                new AllyDefendCheck(this)
             };
         }
 
         public FairFight FairFight { get; set; }
         public GenericPlayer Leader => GameController.ControlledPlayer;
 
+        private Vector3? defendPosition;
+
+        public Vector3? DefendPosition {
+            get => defendPosition;
+            set {
+                defendPosition = value;
+                if (defendPosition != null)
+                    ForceMoveTo(new Vector2(defendPosition.Value.x, defendPosition.Value.z));
+            }
+        }
+
+        public Vector2? DefendPosition2D => DefendPosition.HasValue
+            ? new Vector2(DefendPosition.Value.x, DefendPosition.Value.z)
+            : (Vector2?)null;
+
         public void UpdateFairFight() {
             FairFight.Update();
         }
 
         /* Parent */
+
+        protected override void OnAIDisable() {
+            DefendPosition = null;
+        }
 
         protected override void OnAttackSuccess(GenericCharacter target, float damageDealt) {
             if (!target.IsAlive) {

@@ -9,7 +9,9 @@ namespace Character.Implementation.Base {
         public BaseAIAction AIAction {
             get => aiAction;
             set {
-                if (aiAction is { interruptible: false })
+                if (aiAction == null)
+                    aiAction = value;
+                else if (value == null || value.priority >= aiAction.priority)
                     aiAction = value;
             }
         }
@@ -21,9 +23,15 @@ namespace Character.Implementation.Base {
             var prevAI = UseAI;
             UseAI = useAI;
 
-            // if the AI has been toggled, remove the action
-            if (prevAI != UseAI)
+            // if the AI has been toggled off, remove the action
+            if (prevAI != UseAI && !UseAI) {
                 AIAction = null;
+                OnAIDisable();
+            }
+        }
+
+        protected virtual void OnAIDisable() {
+            // intentionally left blank
         }
 
         private void UpdateAI() {
@@ -39,7 +47,7 @@ namespace Character.Implementation.Base {
         }
 
         public void ForceMoveTo(Vector2 target) {
-            AIAction = new AIMoveAction(this, target, interruptible: true);
+            AIAction = new AIMoveAction(this, target, priority: 3);
         }
 
         public abstract class BaseAICheck {
@@ -68,20 +76,20 @@ namespace Character.Implementation.Base {
 
         public abstract class BaseAIAction {
             protected readonly GenericCharacter instance;
+            protected internal readonly int priority;
             private readonly float maxDuration;
-            internal readonly bool interruptible;
 
             private float duration;
             private bool started;
 
             protected BaseAIAction(
                 GenericCharacter instance,
-                float maxDuration = Mathf.Infinity,
-                bool interruptible = true
+                int priority,
+                float maxDuration = Mathf.Infinity
             ) {
                 this.instance = instance;
+                this.priority = priority;
                 this.maxDuration = maxDuration;
-                this.interruptible = interruptible;
             }
 
             public void Tick() {

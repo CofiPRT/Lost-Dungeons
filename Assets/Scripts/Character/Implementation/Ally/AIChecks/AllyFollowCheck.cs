@@ -11,8 +11,8 @@ namespace Character.Implementation.Ally.AIChecks {
         }
 
         protected override void Perform() {
-            if (instance.FairFight.InFight)
-                return; // only follow when not in a fight
+            if (instance.FairFight.InFight || instance.DefendPosition != null)
+                return; // only follow when not in a fight or defending
 
             var distToLeader = Vector2.Distance(instance.Leader.Pos2D, instance.Pos2D);
             if (distToLeader < 7.5)

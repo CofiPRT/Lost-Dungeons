@@ -12,7 +12,7 @@ namespace Character.Implementation.Base.AIActions {
             bool run = true,
             bool syncLookDirection = true,
             float maxDuration = 5
-        ) : base(instance, maxDuration) {
+        ) : base(instance, 1, maxDuration) {
             this.target = target;
             this.run = run;
             this.syncLookDirection = syncLookDirection;

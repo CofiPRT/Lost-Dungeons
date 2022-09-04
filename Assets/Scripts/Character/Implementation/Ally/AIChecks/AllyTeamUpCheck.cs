@@ -21,7 +21,7 @@ namespace Character.Implementation.Ally.AIChecks {
             // look for a fight - search for an enemy in a radius
             // ReSharper disable once Unity.PreferNonAllocApi
             var enemies = Physics.OverlapSphere(
-                    instance.Pos,
+                    instance.DefendPosition ?? instance.Pos,
                     SearchRadius,
                     LayerMask.GetMask(instance.AttackableTeams.Select(TeamUtils.ToLayer).ToArray())
                 )

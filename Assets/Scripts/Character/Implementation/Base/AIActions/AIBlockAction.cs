@@ -7,7 +7,7 @@ namespace Character.Implementation.Base.AIActions {
         private readonly Vector2 direction;
 
         public AIBlockAction(GenericCharacter instance, Vector2 direction)
-            : base(instance, Random.Range(2, 3)) {
+            : base(instance, 0, Random.Range(2, 3)) {
             this.instance = instance;
             this.direction = direction;
         }
