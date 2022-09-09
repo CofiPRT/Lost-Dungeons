@@ -67,6 +67,9 @@ namespace Character.Abilities.Tristian {
 
                 // start the prop animation
                 ability.prop.StartCast();
+
+                // play sound
+                ability.User.PlaySound(ability.User.castSound);
             }
 
             protected override void OnUpdate() {

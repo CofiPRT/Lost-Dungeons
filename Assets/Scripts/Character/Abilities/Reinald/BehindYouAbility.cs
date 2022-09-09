@@ -1,6 +1,7 @@
 ﻿using Character.Implementation.Enemy;
 using Character.Implementation.Player;
 using Character.Misc;
+using UnityEngine;
 
 namespace Character.Abilities.Reinald {
     public class BehindYouAbility : Ability<BehindYouAbility> {
@@ -63,6 +64,9 @@ namespace Character.Abilities.Reinald {
 
                 // apply stun on target
                 ability.target.AttemptStun(5f, ability.User);
+
+                // play sound
+                ability.User.PlaySound(ability.User.castSound);
             }
         }
 

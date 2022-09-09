@@ -59,7 +59,7 @@ namespace CameraScript {
             var cameraPos = playerPos + TopDownOffset;
             var cameraForward = playerPos - cameraPos;
 
-            CameraController.SetCustomTarget(cameraPos, cameraForward);
+            CameraController.SetCustomTarget(cameraPos, cameraForward, false);
             ScreenController.AddScreen(new TopDownScreen());
             GameController.ShowCursor();
 
@@ -140,7 +140,7 @@ namespace CameraScript {
         private void Update() {
             pathBlockImage.gameObject.SetActive(false);
             arrowImage.gameObject.SetActive(false);
-            
+
             // set the interactability of the buttons
             var interactable = popInCoefficient >= 1;
             applyButton.interactable = interactable;

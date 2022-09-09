@@ -1,6 +1,7 @@
 ﻿using CameraScript;
 using Character.Implementation.Player;
 using Character.Misc;
+using UnityEngine;
 
 namespace Character.Abilities.Tristian {
     public class BerserkAbility : Ability<BerserkAbility> {
@@ -49,6 +50,15 @@ namespace Character.Abilities.Tristian {
 
                 // start the casting animation
                 ability.User.Animator.SetInteger(AnimatorHash.CastID, 2);
+
+                // play sound
+                ability.User.PlaySound(ability.User.ultimateCastSound);
+
+                // move camera in front of the player
+                var position = ability.User.CenterOfMass
+                               + ability.User.Forward * 3f
+                               + ability.User.Right * 2f;
+                CameraController.SetCustomTarget(position, ability.User.EyePosition - position, true);
             }
         }
 
@@ -62,6 +72,9 @@ namespace Character.Abilities.Tristian {
                     filmGrainIntensity: 0f,
                     lensDistortionIntensity: 0f
                 );
+
+                // play sound
+                ability.User.PlaySound(ability.User.ultimateActivateSound);
             }
 
             protected override void OnUpdate() {
@@ -85,6 +98,9 @@ namespace Character.Abilities.Tristian {
                 ability.User.Animator.SetInteger(AnimatorHash.CastID, 0);
 
                 ability.User.StartUltimate();
+
+                // restore camera
+                CameraController.SetFollowPlayer();
             }
         }
 

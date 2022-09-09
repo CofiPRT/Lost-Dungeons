@@ -56,5 +56,18 @@ namespace Character.Implementation.Enemy {
 
             base.UpdateLookDirection();
         }
+
+        protected override void Awake() {
+            base.Awake();
+            LoadAudioClips();
+        }
+
+        private void LoadAudioClips() {
+            const string rootPath = "Audio/Character/Enemy/";
+
+            hurtSound = Resources.Load<AudioClip>(rootPath + "enemy_hurt");
+            deathSound = Resources.Load<AudioClip>(rootPath + "enemy_death");
+            stepSound = Resources.Load<AudioClip>(rootPath + "enemy_step");
+        }
     }
 }

@@ -61,7 +61,6 @@ namespace Character.Implementation.Base {
 
             // if the raycast hit something, the enemy's vision is blocked
             return !Physics.Raycast(ray, out _, distance, LayerMask.GetMask("Terrain", "Barrier"));
-            ;
         }
 
         public bool CanSee(GenericCharacter opponent) {

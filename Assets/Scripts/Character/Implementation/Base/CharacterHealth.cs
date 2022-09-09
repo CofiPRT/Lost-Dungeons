@@ -46,6 +46,8 @@ namespace Character.Implementation.Base {
             LastDamageTime = 0;
             secondCounter = 0;
             secondCounterMana = 0;
+
+            PlaySound(hurtSound);
         }
 
         public void StopHurtAnimation() {
@@ -68,6 +70,8 @@ namespace Character.Implementation.Base {
 
             IgnoreCollisions = true;
             Animator.SetBool(AnimatorHash.Dead, true);
+
+            PlaySound(deathSound);
         }
 
         private void UpdateDeathTime() {

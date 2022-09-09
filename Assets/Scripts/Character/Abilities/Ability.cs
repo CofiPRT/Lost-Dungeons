@@ -57,7 +57,10 @@ namespace Character.Abilities {
             if (Active) {
                 phases[currentPhase].OnReactivation();
             } else {
-                Reset();
+                if (User.IsAttacking)
+                    return false;
+
+                Reset(); // prepare to run the ability again
                 Active = true; // keep it active
             }
 

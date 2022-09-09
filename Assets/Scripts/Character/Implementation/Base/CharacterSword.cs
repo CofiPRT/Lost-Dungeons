@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        protected bool IsAttacking { get; private set; }
+        protected internal bool IsAttacking { get; private set; }
         public bool IsPreparingToAttack { get; private set; }
         private bool AttackBlocksMovement { get; set; }
 
@@ -44,6 +44,8 @@ namespace Character.Implementation.Base {
                 if (damageDealt > 0)
                     OnAttackSuccess(opponent, damageDealt);
             }
+
+            PlaySound(attackSound);
         }
 
         public List<GenericCharacter> GetOpponentsInAttackRange() {

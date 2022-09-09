@@ -53,6 +53,9 @@ namespace Character.Abilities.Shared {
                 ability.otherUser.CastBlocksAbilityUsage = true;
                 ability.otherUser.CastBlocksAttack = true;
                 ability.otherUser.CastBlocksBlock = true;
+
+                // play sound
+                ability.User.PlaySound(ability.User.slowMoInSound);
             }
 
             protected override void OnUpdate() {
@@ -77,6 +80,10 @@ namespace Character.Abilities.Shared {
 
             protected override void OnEnd() {
                 GameController.ChangePlayers();
+
+                // play sound
+                GameController.Player1.PlaySound(ability.User.switchSound);
+                GameController.Player2.PlaySound(ability.User.switchSound);
             }
         }
 

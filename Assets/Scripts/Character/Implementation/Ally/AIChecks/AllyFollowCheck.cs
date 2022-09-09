@@ -23,7 +23,7 @@ namespace Character.Implementation.Ally.AIChecks {
             var leaderPos = instance.Leader.Pos2D;
             var ownPos = instance.Pos2D;
 
-            var direction = (leaderPos - ownPos).normalized;
+            var direction = (ownPos - leaderPos).normalized;
             var desiredAngle = Mathf.Atan2(direction.y, direction.x);
             var deviatedAngle = desiredAngle + Random.Range(-Mathf.PI / 4, Mathf.PI / 4);
 

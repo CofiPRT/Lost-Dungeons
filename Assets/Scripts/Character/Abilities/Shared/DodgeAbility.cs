@@ -58,6 +58,9 @@ namespace Character.Abilities.Shared {
                         opponent => opponent.IsPreparingToAttack &&
                                     opponent.OpponentInAttackArea(ability.User)
                     );
+
+                // play sound
+                ability.User.PlaySound(ability.User.dodgeSound);
             }
         }
 
@@ -72,6 +75,9 @@ namespace Character.Abilities.Shared {
 
                 // prepare the visual effects
                 EffectsController.Prepare();
+
+                // play sound
+                ability.User.PlaySound(ability.User.slowMoInSound);
             }
 
             protected override void OnUpdate() {
@@ -118,6 +124,9 @@ namespace Character.Abilities.Shared {
             public FinalPhase(DodgeAbility ability) : base(ability, 1f, false) { }
 
             protected override void OnUpdate() {
+                if (!ability.dodged)
+                    return;
+
                 // lerp the game speed and the player speed back
                 GameController.GameTickSpeed = Mathf.Lerp(GameTickSpeed, 1.0f, Coefficient);
                 GameController.PlayerTickFactor =

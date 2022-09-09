@@ -105,6 +105,19 @@ namespace Character.Implementation.Ally {
 
         protected override UpdateDelegate UpdateActions => base.UpdateActions + UpdateFairFight;
 
+        protected override void Awake() {
+            base.Awake();
+            LoadAudioClips();
+        }
+
+        private void LoadAudioClips() {
+            const string rootPath = "Audio/Character/Ally/";
+
+            hurtSound = Resources.Load<AudioClip>(rootPath + "ally_hurt");
+            deathSound = Resources.Load<AudioClip>(rootPath + "ally_death");
+            stepSound = Resources.Load<AudioClip>(rootPath + "ally_step");
+        }
+
         /* IComparable */
 
         public int CompareTo(GenericAlly other) {

@@ -41,11 +41,13 @@ namespace Game {
         private float playerTickFactor = 1;
 
         private readonly HashSet<GenericEnemy> aliveEnemies = new HashSet<GenericEnemy>();
+        private readonly HashSet<LevelCollectible> aliveCollectibles = new HashSet<LevelCollectible>();
 
         private float prePauseTickSpeed;
 
         // debug
-        private float gameTickSpeedMultiplier = 1;
+        public float debugMovementSpeedMultiplier = 1;
+        public static float DebugMovementSpeedMultiplier => Instance.debugMovementSpeedMultiplier;
 
         /* static properties */
 
@@ -59,7 +61,7 @@ namespace Game {
         public static HashSet<GenericEnemy> AliveEnemies => Instance.aliveEnemies;
 
         public static float GameTickSpeed {
-            get => Instance.gameTickSpeed * Instance.gameTickSpeedMultiplier;
+            get => Instance.gameTickSpeed;
             set => Instance.gameTickSpeed = value;
         }
 
@@ -88,14 +90,14 @@ namespace Game {
             else
                 SetControlledPlayer(Instance.player2);
         }
-        
+
         private static void SetControlledPlayer(GenericPlayer player) {
             Instance.controlledPlayer = player;
             Instance.controlledPlayer.SetAI(false);
-            
+
             if (OtherPlayer != null)
                 OtherPlayer.SetAI(true);
-            
+
             HUDController.RefreshIcons();
         }
 
@@ -134,7 +136,15 @@ namespace Game {
         }
 
         public static bool AttemptFinish() {
-            return Instance.aliveEnemies.Count == 0;
+            return Instance.aliveEnemies.Count == 0 && Instance.aliveCollectibles.Count == 0;
+        }
+
+        public static void AddCollectible(LevelCollectible collectible) {
+            Instance.aliveCollectibles.Add(collectible);
+        }
+
+        public static void RemoveCollectible(LevelCollectible collectible) {
+            Instance.aliveCollectibles.Remove(collectible);
         }
 
         private void Update() {
@@ -182,9 +192,9 @@ namespace Game {
         }
 
         public static void DebugToggleTurboGameTick() {
-            Instance.gameTickSpeedMultiplier = Instance.gameTickSpeedMultiplier == 100 ? 1 : 100;
+            Instance.debugMovementSpeedMultiplier = Instance.debugMovementSpeedMultiplier == 10 ? 1 : 10;
 
-            Debug.Log("Game tick speed multiplier: " + Instance.gameTickSpeedMultiplier);
+            Debug.Log("Debug movement speed multiplier: " + Instance.debugMovementSpeedMultiplier);
         }
     }
 }

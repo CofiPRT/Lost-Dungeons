@@ -49,6 +49,7 @@ namespace Character.Implementation.Base {
             AwakeCollider();
             AwakeHealthBar();
             AwakeTransparency();
+            AwakeAudio();
         }
 
         protected delegate void UpdateDelegate();
@@ -66,6 +67,7 @@ namespace Character.Implementation.Base {
 
         protected UpdateDelegate FixedUpdateActions => delegate {
             UpdateMovement();
+            UpdateFootsteps();
             UpdateLookDirection();
         };
 

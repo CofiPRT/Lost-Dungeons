@@ -35,5 +35,10 @@ namespace Character.Implementation.Player {
             if (UltimateActive)
                 Heal(10f);
         }
+
+        protected override void Awake() {
+            base.Awake();
+            ultimateCastSound = Resources.Load<AudioClip>("Audio/Character/Player/ultimate_tristian");
+        }
     }
 }

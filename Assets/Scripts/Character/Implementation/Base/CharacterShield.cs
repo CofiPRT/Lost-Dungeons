@@ -50,10 +50,12 @@ namespace Character.Implementation.Base {
                     return 0;
                 case -1:
                     // damage blocked completely, the shield is still up
+                    PlaySound(blockSound);
                     return 0;
                 case -2:
                     // damage blocked completely, the attacker is stunned
                     source.AttemptStun(FailedBlockStunDuration, this);
+                    PlaySound(blockSound);
 
                     return 0;
             }
@@ -79,8 +81,10 @@ namespace Character.Implementation.Base {
                 return;
 
             IsBlocking = false;
-            if (force)
+            if (force) {
                 ShieldCooldown = ShieldRechargeTime;
+                PlaySound(blockBreakSound);
+            }
 
             Animator.SetBool(AnimatorHash.Blocking, false);
         }

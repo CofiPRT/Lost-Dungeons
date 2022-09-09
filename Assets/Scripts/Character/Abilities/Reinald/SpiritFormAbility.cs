@@ -49,6 +49,15 @@ namespace Character.Abilities.Reinald {
 
                 // start the casting animation
                 ability.User.Animator.SetInteger(AnimatorHash.CastID, 3);
+
+                // play sound
+                ability.User.PlaySound(ability.User.ultimateCastSound);
+
+                // move camera in front of the player
+                var position = ability.User.CenterOfMass
+                               + ability.User.Forward * 3f
+                               + ability.User.Right * 2f;
+                CameraController.SetCustomTarget(position, ability.User.EyePosition - position, true);
             }
         }
 
@@ -65,6 +74,9 @@ namespace Character.Abilities.Reinald {
                     filmGrainIntensity: 0f,
                     lensDistortionIntensity: 0f
                 );
+
+                // play sound
+                ability.User.PlaySound(ability.User.ultimateActivateSound);
             }
 
             protected override void OnUpdate() {
@@ -88,6 +100,9 @@ namespace Character.Abilities.Reinald {
                 ability.User.Animator.SetInteger(AnimatorHash.CastID, 0);
 
                 ability.User.StartUltimate();
+
+                // restore camera
+                CameraController.SetFollowPlayer();
             }
         }
 

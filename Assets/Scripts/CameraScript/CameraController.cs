@@ -40,6 +40,7 @@ namespace CameraScript {
         public bool invertY;
         public bool canRotate = true;
         public bool followPlayer = true;
+        public bool usePlayerForCollision;
         public Vector3 customTarget;
         public Vector3 customForward;
 
@@ -76,10 +77,7 @@ namespace CameraScript {
         }
 
         public void ApplyInput(float horizontal, float vertical) {
-            if (!canRotate) {
-                PerformCollision();
-                return;
-            }
+            if (!canRotate || !followPlayer) return;
 
             rotation.x += horizontalSensitivity * horizontal;
             rotation.y += verticalSensitivity * vertical * (invertY ? 1 : -1);
@@ -87,8 +85,6 @@ namespace CameraScript {
             // keep in bounds
             rotation.x = Mathf.Repeat(rotation.x, 360);
             rotation.y = Mathf.Clamp(rotation.y, minYAngle, maxYAngle);
-
-            PerformCollision();
         }
 
         private void PerformCollision() {
@@ -126,12 +122,16 @@ namespace CameraScript {
 
             // find the clip point that needs to be the closest the target
             var distance = distanceFromTarget;
+            var raycastTarget = usePlayerForCollision
+                ? GameController.ControlledPlayer.transform.position +
+                  GameController.ControlledPlayer.GetComponent<Rigidbody>().centerOfMass
+                : targetPos;
 
             foreach (var clipPoint in clipPoints) {
                 // perform a raycast from the target position to each of the clip points
-                var direction = clipPoint - targetPos;
+                var direction = clipPoint - raycastTarget;
 
-                if (!Physics.Raycast(targetPos, direction, out var hit, distanceFromTarget, collisionLayer))
+                if (!Physics.Raycast(raycastTarget, direction, out var hit, distanceFromTarget, collisionLayer))
                     continue;
 
                 if (hit.distance < distance)
@@ -146,10 +146,11 @@ namespace CameraScript {
             transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
         }
 
-        public static void SetCustomTarget(Vector3 target, Vector3 forward) {
+        public static void SetCustomTarget(Vector3 target, Vector3 forward, bool usePlayerForCollision) {
             Instance.customTarget = target;
             Instance.customForward = forward;
             Instance.followPlayer = false;
+            Instance.usePlayerForCollision = usePlayerForCollision;
         }
 
         public static void SetFollowPlayer() {

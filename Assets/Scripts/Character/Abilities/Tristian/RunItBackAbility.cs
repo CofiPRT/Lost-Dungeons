@@ -65,6 +65,9 @@ namespace Character.Abilities.Tristian {
 
                 // ensure the decoy spawns invisible
                 ability.decoy.LerpTransparency(0f);
+
+                // play sound
+                ability.User.PlaySound(ability.User.castSound);
             }
 
             protected override void OnUpdate() {
@@ -108,6 +111,9 @@ namespace Character.Abilities.Tristian {
 
                 // start the casting animation
                 ability.User.Animator.SetInteger(AnimatorHash.CastID, 1);
+
+                // play sound
+                ability.User.PlaySound(ability.User.castSound);
             }
 
             protected override void OnUpdate() {

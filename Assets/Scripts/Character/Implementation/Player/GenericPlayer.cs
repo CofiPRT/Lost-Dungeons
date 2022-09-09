@@ -9,7 +9,6 @@ using Character.Implementation.Base;
 using Character.Implementation.Enemy;
 using Game;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Character.Implementation.Player {
     public abstract class GenericPlayer : GenericAlly {
@@ -155,7 +154,31 @@ namespace Character.Implementation.Player {
             return angle < ConeAngle;
         }
 
+        /* Sound */
+
+        protected internal AudioClip castSound;
+        protected internal AudioClip switchSound;
+        protected internal AudioClip dodgeSound;
+        protected internal AudioClip slowMoInSound;
+
+        protected internal AudioClip ultimateCastSound;
+
+        protected internal AudioClip ultimateActivateSound;
+
+        private void LoadAudioClips() {
+            const string rootPath = "Audio/Character/Player/";
+
+            castSound = Resources.Load<AudioClip>(rootPath + "cast");
+            switchSound = Resources.Load<AudioClip>(rootPath + "switch");
+            dodgeSound = Resources.Load<AudioClip>(rootPath + "dodge");
+            slowMoInSound = Resources.Load<AudioClip>(rootPath + "slowmo_in");
+            ultimateActivateSound = Resources.Load<AudioClip>(rootPath + "ultimate_activate");
+        }
+
         /* Parent */
+
+        protected override float MovementSpeedFactor =>
+            base.MovementSpeedFactor * GameController.DebugMovementSpeedMultiplier;
 
         protected override bool CanApplyMovement => base.CanApplyMovement && !CastBlocksMovement;
         protected override bool CanStartAttack => base.CanStartAttack && !CastBlocksAttack;
@@ -182,6 +205,11 @@ namespace Character.Implementation.Player {
             base.OnDeath();
 
             GameController.StartDeath(Name);
+        }
+
+        protected override void Awake() {
+            base.Awake();
+            LoadAudioClips();
         }
     }
 }

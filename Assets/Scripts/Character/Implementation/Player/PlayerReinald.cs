@@ -26,5 +26,10 @@ namespace Character.Implementation.Player {
             // reset ultimate cooldown
             Ultimate.Reset();
         }
+
+        protected override void Awake() {
+            base.Awake();
+            ultimateCastSound = Resources.Load<AudioClip>("Audio/Character/Player/ultimate_reinald");
+        }
     }
 }
