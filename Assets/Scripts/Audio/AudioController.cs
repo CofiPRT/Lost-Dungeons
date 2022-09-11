@@ -42,13 +42,13 @@ namespace Audio {
         private void Start() {
             // choose a song to play
             if (forceBattle) {
+                PlayBattle(true);
                 ambienceSource.volume = 0;
                 battleSource.volume = battleVolume;
-                PlayBattle(true);
             } else {
+                PlayAmbience();
                 ambienceSource.volume = ambienceVolume;
                 battleSource.volume = 0;
-                PlayAmbience();
             }
         }
 
@@ -106,7 +106,7 @@ namespace Audio {
             battleSource.clip = battleClip.audioClip;
 
             // only restart if the volume is 0
-            if (battleSource.volume == 0) {
+            if (battleSource.volume == 0 || start) {
                 battleSource.time = battleClipSeekTimes[start ? 0 : Random.Range(0, battleClipSeekTimes.Count)];
                 battleSource.Play();
             }
