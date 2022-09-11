@@ -5,7 +5,7 @@ using Character.Misc;
 using Props;
 using UnityEngine;
 
-namespace Game {
+namespace Game.Util {
     public class Instances : MonoBehaviour {
         [Header("Players")]
         public PlayerTristian tristian;

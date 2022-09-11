@@ -1,8 +1,7 @@
-﻿using System;
-using Character.Implementation.Player;
+﻿using Character.Implementation.Player;
 using UnityEngine;
 
-namespace Game {
+namespace Game.Objects {
     public class LevelFinisher : MonoBehaviour {
         private bool finished;
 

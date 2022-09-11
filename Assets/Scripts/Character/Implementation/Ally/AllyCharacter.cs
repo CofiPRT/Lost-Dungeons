@@ -1,4 +1,5 @@
 ﻿using Character.Implementation.Base;
+using Properties;
 
 namespace Character.Implementation.Ally {
     public class AllyCharacter : GenericAlly {
@@ -7,7 +8,7 @@ namespace Character.Implementation.Ally {
         private static CharacterBuilder CreateData() {
             return new CharacterBuilder {
                 name = "Ally",
-                team = Properties.Team.Ally
+                team = Team.Ally
             };
         }
     }

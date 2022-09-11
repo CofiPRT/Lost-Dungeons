@@ -1,6 +1,5 @@
 ﻿using Character.Implementation.Base.AIActions;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
@@ -17,17 +16,15 @@ namespace Character.Implementation.Base {
         }
 
         protected BaseAICheck[] AIChecks { get; set; }
-        private bool UseAI { get; set; }
+        private bool UseAI { get; set; } = true;
 
-        public void SetAI(bool useAI) {
-            var prevAI = UseAI;
-            UseAI = useAI;
+        public virtual void ActivateAI() {
+            UseAI = true;
+        }
 
-            // if the AI has been toggled off, remove the action
-            if (prevAI != UseAI && !UseAI) {
-                AIAction = null;
-                OnAIDisable();
-            }
+        public virtual void DeactivateAI() {
+            UseAI = false;
+            OnAIDisable();
         }
 
         protected virtual void OnAIDisable() {

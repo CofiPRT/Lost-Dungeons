@@ -10,7 +10,7 @@ namespace Character.Implementation.Player {
                     GameController.DefaultInstances.tristian,
                     ownTransform.position,
                     ownTransform.rotation,
-                    GameController.SpawnContainer
+                    GameController.SpawnContainerPlayers
                 )
             );
 

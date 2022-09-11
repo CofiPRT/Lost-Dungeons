@@ -31,13 +31,13 @@ namespace CameraScript.HUD {
 
         private void StartHealthBars() {
             // handle player1
-            player1HUD = (RectTransform)transform.Find("Player1");
+            player1HUD = transform.Find("Player1").GetComponent<RectTransform>();
             player1HealthBar = player1HUD.transform.Find("Bars/HealthBar").GetComponent<Image>();
             player1ManaBar = player1HUD.transform.Find("Bars/ManaBar").GetComponent<Image>();
             player1HUD.gameObject.SetActive(false);
 
             // handle player2
-            player2HUD = (RectTransform)transform.Find("Player2");
+            player2HUD = transform.Find("Player2").GetComponent<RectTransform>();
             player2HealthBar = player2HUD.transform.Find("Bars/HealthBar").GetComponent<Image>();
             player2ManaBar = player2HUD.transform.Find("Bars/ManaBar").GetComponent<Image>();
             player2HUD.gameObject.SetActive(false);
@@ -83,7 +83,6 @@ namespace CameraScript.HUD {
 
                 initialized = true;
             }
-
 
             // lerp players' health and mana bars
             if (GameController.Player1 != null) {

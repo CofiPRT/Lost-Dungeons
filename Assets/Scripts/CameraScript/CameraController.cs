@@ -33,6 +33,7 @@ namespace CameraScript {
 
         public float heightFromTarget;
         public float distanceFromTarget = 5.0f;
+        public float preferredFOV = 45.0f;
 
         [Range(0.1f, 10.0f)] public float horizontalSensitivity = 1.0f;
         [Range(0.1f, 10.0f)] public float verticalSensitivity = 1.0f;
@@ -40,9 +41,11 @@ namespace CameraScript {
         public bool invertY;
         public bool canRotate = true;
         public bool followPlayer = true;
+        public bool updateFOV = true;
         public bool usePlayerForCollision;
         public Vector3 customTarget;
-        public Vector3 customForward;
+        public Vector3 customRotation;
+        public bool customLerp;
 
         [Range(-90.0f, 0.0f)] public float minYAngle = -45.0f;
         [Range(0.0f, 90.0f)] public float maxYAngle = 45.0f;
@@ -69,9 +72,16 @@ namespace CameraScript {
         private void Update() {
             var desiredRotation = followPlayer
                 ? Quaternion.Euler(rotation.y, rotation.x, 0)
-                : Quaternion.LookRotation(customForward);
+                : Quaternion.Euler(customRotation);
 
-            transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, smoothSpeed * Time.deltaTime);
+            transform.rotation = followPlayer || customLerp
+                ? Quaternion.Lerp(transform.rotation, desiredRotation, smoothSpeed * Time.deltaTime)
+                : desiredRotation;
+
+            if (updateFOV)
+                usedCamera.fieldOfView = followPlayer || customLerp
+                    ? Mathf.Lerp(usedCamera.fieldOfView, preferredFOV, smoothSpeed * Time.deltaTime)
+                    : preferredFOV;
 
             PerformCollision();
         }
@@ -87,21 +97,27 @@ namespace CameraScript {
             rotation.y = Mathf.Clamp(rotation.y, minYAngle, maxYAngle);
         }
 
-        private void PerformCollision() {
-            Vector3 targetPos;
+        private Vector3 FindDesiredPosition(out Vector3 targetPos) {
             Vector3 desiredPosition;
 
-            if (followPlayer) {
-                var target = GameController.ControlledPlayer;
-                if (target == null)
-                    return;
-
-                targetPos = target.transform.position + target.GetComponent<Rigidbody>().centerOfMass;
+            if (followPlayer && GameController.ControlledPlayer is { } target) {
+                targetPos = target.UpdatedCenterOfMass;
                 desiredPosition = targetPos - transform.forward * distanceFromTarget;
                 desiredPosition += new Vector3(0, heightFromTarget, 0);
             } else {
                 desiredPosition = customTarget;
                 targetPos = customTarget;
+            }
+
+            return desiredPosition;
+        }
+
+        private void PerformCollision() {
+            var desiredPosition = FindDesiredPosition(out var targetPos);
+
+            if (!usePlayerForCollision) {
+                transform.position = desiredPosition;
+                return;
             }
 
             // compute offsets for every axis
@@ -123,8 +139,7 @@ namespace CameraScript {
             // find the clip point that needs to be the closest the target
             var distance = distanceFromTarget;
             var raycastTarget = usePlayerForCollision
-                ? GameController.ControlledPlayer.transform.position +
-                  GameController.ControlledPlayer.GetComponent<Rigidbody>().centerOfMass
+                ? GameController.ControlledPlayer.UpdatedCenterOfMass
                 : targetPos;
 
             foreach (var clipPoint in clipPoints) {
@@ -143,18 +158,35 @@ namespace CameraScript {
                 desiredPosition += transform.forward * (distanceFromTarget - distance);
 
             // perform smooth lerping
-            transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+            transform.position = followPlayer || customLerp
+                ? Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime)
+                : desiredPosition;
         }
 
-        public static void SetCustomTarget(Vector3 target, Vector3 forward, bool usePlayerForCollision) {
+        public static void SetCustomTarget(
+            Vector3 target,
+            Vector3 rotation,
+            float? fov = null,
+            bool customLerp = true,
+            bool usePlayerForCollision = true
+        ) {
             Instance.customTarget = target;
-            Instance.customForward = forward;
+            Instance.customRotation = rotation;
+            Instance.customLerp = customLerp;
             Instance.followPlayer = false;
             Instance.usePlayerForCollision = usePlayerForCollision;
+
+            if (fov.HasValue) {
+                Instance.updateFOV = false;
+                Instance.usedCamera.fieldOfView = fov.Value;
+            }
         }
 
         public static void SetFollowPlayer() {
+            Instance.canRotate = true;
             Instance.followPlayer = true;
+            Instance.usePlayerForCollision = true;
+            Instance.updateFOV = true;
         }
     }
 }

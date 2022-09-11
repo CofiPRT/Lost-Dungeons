@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Game {
+namespace Game.Util {
     public class BarrierDrawer : MonoBehaviour {
         public float lowerYLimit = -10f;
         public float upperYLimit = 10f;

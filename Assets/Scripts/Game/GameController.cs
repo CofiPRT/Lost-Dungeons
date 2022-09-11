@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using CameraScript.HUD;
+using Character.Implementation.Ally;
 using Character.Implementation.Enemy;
 using Character.Implementation.Player;
+using Game.Objects;
 using Game.Screens;
+using Game.Util;
+using Menu;
 using UnityEngine;
 
 namespace Game {
@@ -17,7 +21,10 @@ namespace Game {
                 Instance = this;
 
             defaultInstances = GetComponent<Instances>();
-            spawnContainer = transform.Find("SpawnContainer").transform;
+            spawnContainerEnemies = transform.Find("SpawnContainer/Enemies").transform;
+            spawnContainerAllies = transform.Find("SpawnContainer/Allies").transform;
+            spawnContainerPlayers = transform.Find("SpawnContainer/Players").transform;
+            spawnContainerObjects = transform.Find("SpawnContainer/Objects").transform;
 
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
@@ -26,10 +33,16 @@ namespace Game {
         public string levelID; // to be set in the inspector
 
         private Instances defaultInstances;
-        private Transform spawnContainer;
+        private Transform spawnContainerEnemies;
+        private Transform spawnContainerAllies;
+        private Transform spawnContainerPlayers;
+        private Transform spawnContainerObjects;
 
         public static Instances DefaultInstances => Instance.defaultInstances;
-        public static Transform SpawnContainer => Instance.spawnContainer;
+        public static Transform SpawnContainerEnemies => Instance.spawnContainerEnemies;
+        public static Transform SpawnContainerAllies => Instance.spawnContainerAllies;
+        public static Transform SpawnContainerPlayers => Instance.spawnContainerPlayers;
+        public static Transform SpawnContainerObjects => Instance.spawnContainerObjects;
 
         /* game data */
 
@@ -41,6 +54,7 @@ namespace Game {
         private float playerTickFactor = 1;
 
         private readonly HashSet<GenericEnemy> aliveEnemies = new HashSet<GenericEnemy>();
+        private readonly HashSet<GenericAlly> aliveAllies = new HashSet<GenericAlly>();
         private readonly HashSet<LevelCollectible> aliveCollectibles = new HashSet<LevelCollectible>();
 
         private float prePauseTickSpeed;
@@ -58,7 +72,11 @@ namespace Game {
         public static GenericPlayer OtherPlayer =>
             Instance.controlledPlayer == Instance.player1 ? Instance.player2 : Instance.player1;
 
+        public static bool ControlAllowed { get; set; }
+
         public static HashSet<GenericEnemy> AliveEnemies => Instance.aliveEnemies;
+        public static HashSet<GenericAlly> AliveAllies => Instance.aliveAllies;
+        public static HashSet<LevelCollectible> AliveCollectibles => Instance.aliveCollectibles;
 
         public static float GameTickSpeed {
             get => Instance.gameTickSpeed;
@@ -72,31 +90,32 @@ namespace Game {
 
         public static void SetPlayer1(GenericPlayer player) {
             Instance.player1 = player;
+            Instance.player1.DeactivateAI();
             Instance.player1.HideHealthBar();
 
             if (Instance.player2 != null) // set a random player as the controlled player
-                SetControlledPlayer(Random.value > 0.5f ? Instance.player1 : Instance.player2);
+                SetControlledPlayer(Random.value > 0.5f ? Instance.player1 : Instance.player2, false);
             else
-                SetControlledPlayer(Instance.player1);
+                SetControlledPlayer(Instance.player1, false);
         }
 
         public static void SetPlayer2(GenericPlayer player) {
             Instance.player2 = player;
-            Instance.player2.SetAI(false);
+            Instance.player2.DeactivateAI();
             Instance.player2.HideHealthBar();
 
             if (Instance.player1 != null) // set a random player as the controlled player
-                SetControlledPlayer(Random.value > 0.5f ? Instance.player1 : Instance.player2);
+                SetControlledPlayer(Random.value > 0.5f ? Instance.player1 : Instance.player2, false);
             else
-                SetControlledPlayer(Instance.player2);
+                SetControlledPlayer(Instance.player2, false);
         }
 
-        private static void SetControlledPlayer(GenericPlayer player) {
+        private static void SetControlledPlayer(GenericPlayer player, bool activateAI = true) {
             Instance.controlledPlayer = player;
-            Instance.controlledPlayer.SetAI(false);
+            Instance.controlledPlayer.DeactivateAI();
 
-            if (OtherPlayer != null)
-                OtherPlayer.SetAI(true);
+            if (activateAI && OtherPlayer != null)
+                OtherPlayer.ActivateAI();
 
             HUDController.RefreshIcons();
         }
@@ -113,7 +132,7 @@ namespace Game {
             GameTickSpeed = 0;
 
             ScreenController.AddScreen(new PauseScreen());
-            HUDController.Pause();
+            PauseMenuController.Pause();
 
             ShowCursor();
         }
@@ -156,7 +175,7 @@ namespace Game {
                 DefaultInstances.enemyWhite,
                 ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
                 Quaternion.identity,
-                SpawnContainer
+                SpawnContainerEnemies
             );
 
             Debug.Log("Spawned enemy");
@@ -167,7 +186,7 @@ namespace Game {
                 DefaultInstances.bottle,
                 ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
                 Quaternion.identity,
-                SpawnContainer
+                SpawnContainerObjects
             );
 
             Debug.Log("Spawned prop");
@@ -178,7 +197,7 @@ namespace Game {
                 DefaultInstances.ally,
                 ControlledPlayer.Pos + ControlledPlayer.Forward * 5,
                 Quaternion.identity,
-                SpawnContainer
+                SpawnContainerAllies
             );
 
             Debug.Log("Spawned ally");
@@ -192,7 +211,7 @@ namespace Game {
         }
 
         public static void DebugToggleTurboGameTick() {
-            Instance.debugMovementSpeedMultiplier = Instance.debugMovementSpeedMultiplier == 10 ? 1 : 10;
+            Instance.debugMovementSpeedMultiplier = Instance.debugMovementSpeedMultiplier <= 10 ? 1 : 10;
 
             Debug.Log("Debug movement speed multiplier: " + Instance.debugMovementSpeedMultiplier);
         }

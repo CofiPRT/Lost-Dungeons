@@ -103,6 +103,10 @@ namespace Character.Implementation.Ally {
             FairFight.UnsubscribeAll();
         }
 
+        protected override void OnDestroy() {
+            GameController.AliveAllies.Remove(this);
+        }
+
         protected override UpdateDelegate UpdateActions => base.UpdateActions + UpdateFairFight;
 
         protected override void Awake() {

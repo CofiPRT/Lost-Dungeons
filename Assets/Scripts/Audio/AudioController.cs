@@ -5,11 +5,10 @@ using UnityEngine;
 
 namespace Audio {
     public class AudioController : MonoBehaviour {
-        public List<AudioClip> ambienceClips;
-        public AudioClip battleClip;
+        private List<AudioClipData> ambienceClips;
+        private AudioClipData battleClip;
 
         public List<float> battleClipSeekTimes = new List<float> { 0 };
-        public float earlyEndSeekTime;
 
         [Range(0f, 0.05f)] public float ambienceVolume = 0.01f;
         [Range(0f, 0.05f)] public float battleVolume = 0.01f;
@@ -26,22 +25,34 @@ namespace Audio {
         private void Awake() {
             ambienceSource = gameObject.AddComponent<AudioSource>();
             ambienceSource.playOnAwake = false;
-            ambienceSource.volume = ambienceVolume;
 
             battleSource = gameObject.AddComponent<AudioSource>();
             battleSource.playOnAwake = false;
-            battleSource.volume = battleVolume;
             battleSource.loop = true;
+
+            // acquire ambience clips
+            ambienceClips = new List<AudioClipData>();
+            foreach (var clipData in transform.Find("Ambience").GetComponentsInChildren<AudioClipData>())
+                ambienceClips.Add(clipData);
+
+            // acquire battle clip
+            battleClip = transform.Find("Battle").GetComponent<AudioClipData>();
         }
 
         private void Start() {
             // choose a song to play
-            if (forceBattle)
+            if (forceBattle) {
+                ambienceSource.volume = 0;
+                battleSource.volume = battleVolume;
                 PlayBattle(true);
-            else
+            } else {
+                ambienceSource.volume = ambienceVolume;
+                battleSource.volume = 0;
                 PlayAmbience();
+            }
         }
 
+        private float earlyEndTime;
         private float timeSinceLastFight;
         private bool playingBattle;
 
@@ -51,7 +62,7 @@ namespace Audio {
 
         private void Update() {
             // restart battle music if it's been too long
-            if (earlyEndSeekTime > 0 && playingBattle && battleSource.time >= earlyEndSeekTime)
+            if (earlyEndTime > 0 && playingBattle && battleSource.time >= earlyEndTime)
                 battleSource.time = battleClipSeekTimes[0];
 
             if (forceBattle)
@@ -79,22 +90,28 @@ namespace Audio {
                 StartCoroutine(FadeOut(battleSource, battleFadeOutTime, true));
             } else if (!playingBattle && !inFight) {
                 // if the song ended, play one more
-                if (ambienceSource.time >= ambienceSource.clip.length)
+                if (ambienceSource.time >= earlyEndTime)
                     PlayAmbience();
             }
         }
 
         private void PlayAmbience() {
-            ambienceSource.clip = ambienceClips[Random.Range(0, ambienceClips.Count)];
+            var clipData = ambienceClips[Random.Range(0, ambienceClips.Count)];
+            ambienceSource.clip = clipData.audioClip;
             ambienceSource.Play();
+            earlyEndTime = clipData.earlyEndTime;
         }
 
         private void PlayBattle(bool start = false) {
-            battleSource.clip = battleClip;
-            battleSource.time = battleClipSeekTimes[start ? 0 : Random.Range(0, battleClipSeekTimes.Count)];
-            battleSource.Play();
+            battleSource.clip = battleClip.audioClip;
 
-            Debug.Log("Playing from " + battleSource.time);
+            // only restart if the volume is 0
+            if (battleSource.volume == 0) {
+                battleSource.time = battleClipSeekTimes[start ? 0 : Random.Range(0, battleClipSeekTimes.Count)];
+                battleSource.Play();
+            }
+
+            earlyEndTime = battleClip.earlyEndTime;
         }
 
         private IEnumerator FadeIn(AudioSource source, float targetVolume, float time) {

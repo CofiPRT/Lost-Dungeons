@@ -30,9 +30,6 @@ namespace Character.Implementation.Base {
 
             Mana = data.maxMana;
             MaxMana = data.maxMana;
-
-            // by default, the AI is enabled
-            SetAI(true);
         }
 
         public Vector3 Pos => transform.position;

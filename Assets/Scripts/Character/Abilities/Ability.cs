@@ -1,7 +1,6 @@
 ﻿using System;
 using Character.Implementation.Player;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Character.Abilities {
     public interface IAbility {

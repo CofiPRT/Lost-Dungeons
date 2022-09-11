@@ -1,4 +1,5 @@
 ﻿using Character.Implementation.Base;
+using Properties;
 
 namespace Character.Implementation.Enemy {
     public class EnemyViolet : GenericEnemy {
@@ -11,8 +12,8 @@ namespace Character.Implementation.Enemy {
                 maxHealth = 150,
                 attackDamage = 15,
 
-                attackStrength = Properties.AttackStrength.Strong,
-                blockStrength = Properties.BlockStrength.Strong
+                attackStrength = AttackStrength.Strong,
+                blockStrength = BlockStrength.Strong
             };
         }
     }

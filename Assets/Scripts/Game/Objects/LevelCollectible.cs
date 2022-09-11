@@ -1,7 +1,7 @@
 ﻿using Character.Implementation.Player;
 using UnityEngine;
 
-namespace Game {
+namespace Game.Objects {
     public class LevelCollectible : MonoBehaviour {
         private const float LevitationSpeed = 2f;
         private const float LiftSpeed = 5f;
@@ -15,6 +15,9 @@ namespace Game {
         private void Start() {
             GameController.AddCollectible(this);
             originalPosition = transform.position;
+
+            // set inactive
+            gameObject.SetActive(false);
         }
 
         private void OnTriggerStay(Collider other) {

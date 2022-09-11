@@ -1,6 +1,5 @@
 ﻿using System;
 using Character.Misc;
-using Game;
 using Properties;
 
 namespace Character.Implementation.Base {
@@ -66,7 +65,7 @@ namespace Character.Implementation.Base {
             EndStun();
             StopMoving();
             StopBlocking();
-            SetAI(false);
+            DeactivateAI();
 
             IgnoreCollisions = true;
             Animator.SetBool(AnimatorHash.Dead, true);

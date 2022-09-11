@@ -1,5 +1,4 @@
-﻿using Character.Implementation.Enemy;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Character.Implementation.Base.AIActions {
     public class AIBlockAction : GenericCharacter.BaseAIAction {

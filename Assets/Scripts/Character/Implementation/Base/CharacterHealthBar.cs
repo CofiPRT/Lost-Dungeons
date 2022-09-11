@@ -15,7 +15,7 @@ namespace Character.Implementation.Base {
             var instance = Team == Team.Enemy
                 ? GameController.DefaultInstances.redHealthBar
                 : GameController.DefaultInstances.greenHealthBar;
-            healthBarCanvas = Instantiate(instance, GameController.SpawnContainer);
+            healthBarCanvas = Instantiate(instance, GameController.SpawnContainerObjects);
             healthBarFill = healthBarCanvas.transform.Find("Fill").GetComponent<Image>();
         }
 

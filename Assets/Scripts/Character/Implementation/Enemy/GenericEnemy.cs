@@ -43,9 +43,6 @@ namespace Character.Implementation.Enemy {
         protected override void OnDeath() {
             base.OnDeath();
             FairFight?.Unsubscribe(this);
-        }
-
-        protected override void OnDestroy() {
             GameController.AliveEnemies.Remove(this);
         }
 

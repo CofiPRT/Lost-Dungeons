@@ -8,6 +8,7 @@ using Character.Implementation.Ally;
 using Character.Implementation.Base;
 using Character.Implementation.Enemy;
 using Game;
+using Properties;
 using UnityEngine;
 
 namespace Character.Implementation.Player {
@@ -23,7 +24,7 @@ namespace Character.Implementation.Player {
         private static CharacterBuilder CreateData(string name) {
             return new CharacterBuilder {
                 name = name,
-                team = Properties.Team.Player
+                team = Team.Player
             };
         }
 
@@ -188,6 +189,20 @@ namespace Character.Implementation.Player {
             base.MovementCanSyncLookDirection && !CastBlocksMovementLookDirectionSync;
 
         protected override UpdateDelegate UpdateActions => base.UpdateActions + UpdateAbilities;
+
+        public override void ActivateAI() {
+            base.ActivateAI();
+
+            // set rigid body to a lower value
+            RigidBody.mass = 10000f;
+        }
+
+        public override void DeactivateAI() {
+            base.DeactivateAI();
+
+            // set rigid body to a higher value
+            RigidBody.mass = 1000000f;
+        }
 
         protected override void OnAttackSuccess(GenericCharacter target, float damageDealt) {
             base.OnAttackSuccess(target, damageDealt);

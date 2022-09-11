@@ -83,7 +83,7 @@ namespace Character.Abilities.Shared {
                 // lerp HUD if necessary
                 if (ability.changePlayers) {
                     HUDController.LerpOtherSizeUp(Coefficient);
-                    HUDController.LerpTransparency(1 - Coefficient);
+                    HUDController.LerpCooldownTransparency(1 - Coefficient);
                 }
             }
 
@@ -94,7 +94,7 @@ namespace Character.Abilities.Shared {
 
                 if (ability.changePlayers) {
                     HUDController.LerpOtherSizeUp(1.0f);
-                    HUDController.LerpTransparency(0.0f);
+                    HUDController.LerpCooldownTransparency(0.0f);
                 }
             }
         }
@@ -190,7 +190,7 @@ namespace Character.Abilities.Shared {
                 // lerp HUD back if necessary
                 if (ability.changePlayers) {
                     HUDController.LerpOtherSizeDown(Coefficient);
-                    HUDController.LerpTransparency(Coefficient);
+                    HUDController.LerpCooldownTransparency(Coefficient);
                 }
             }
 
@@ -201,7 +201,7 @@ namespace Character.Abilities.Shared {
 
                 if (ability.changePlayers) {
                     HUDController.LerpOtherSizeDown(1.0f);
-                    HUDController.LerpTransparency(1.0f);
+                    HUDController.LerpCooldownTransparency(1.0f);
                 }
 
                 // also start the cooldown of the partner's ability

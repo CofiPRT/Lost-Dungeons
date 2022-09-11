@@ -60,7 +60,7 @@ namespace Character.Abilities.Tristian {
                     GameController.DefaultInstances.decoy,
                     ability.User.Pos,
                     userTransform.rotation,
-                    GameController.SpawnContainer
+                    GameController.SpawnContainerAllies
                 );
 
                 // ensure the decoy spawns invisible

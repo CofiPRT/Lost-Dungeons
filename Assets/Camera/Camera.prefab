@@ -135,10 +135,15 @@ MonoBehaviour:
   smoothSpeed: 10
   heightFromTarget: 0
   distanceFromTarget: 5
+  preferredFOV: 45
   horizontalSensitivity: 1
   verticalSensitivity: 1
-  canRotate: 1
   invertY: 0
+  canRotate: 1
+  followPlayer: 1
+  usePlayerForCollision: 0
+  customTarget: {x: 0, y: 0, z: 0}
+  customForward: {x: 0, y: 0, z: 0}
   minYAngle: -45
   maxYAngle: 45
   collisionLayer:

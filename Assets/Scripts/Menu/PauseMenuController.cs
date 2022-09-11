@@ -3,12 +3,35 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace CameraScript.HUD {
-    public partial class HUDController {
+namespace Menu {
+    public class PauseMenuController : MonoBehaviour {
+        // singleton
+        private static PauseMenuController Instance { get; set; }
+
+        private CanvasGroup canvasGroup;
+
+        private void Awake() {
+            if (Instance != null && Instance != this) {
+                Destroy(this);
+                return;
+            }
+
+            Instance = this;
+
+            canvasGroup = GetComponent<CanvasGroup>();
+            mainPauseButtons = transform.Find("MainPauseButtons");
+            exitConfirmationButtons = transform.Find("ExitConfirmationButtons");
+            raycaster = transform.GetComponent<GraphicRaycaster>();
+
+            activeButtons = mainPauseButtons;
+            mainPauseButtons.gameObject.SetActive(true);
+            exitConfirmationButtons.gameObject.SetActive(false);
+            raycaster.enabled = false;
+        }
+
         private const float PauseLerpSpeed = 10f;
         private const float LerpEpsilon = 0.001f;
 
-        private CanvasGroup pauseMenuRoot;
         private Transform mainPauseButtons;
         private Transform exitConfirmationButtons;
 
@@ -17,18 +40,6 @@ namespace CameraScript.HUD {
         private Transform activeButtons;
 
         private bool isPaused;
-
-        private void AwakePauseMenu() {
-            pauseMenuRoot = transform.Find("PauseMenu").GetComponent<CanvasGroup>();
-            mainPauseButtons = pauseMenuRoot.transform.Find("MainPauseButtons");
-            exitConfirmationButtons = pauseMenuRoot.transform.Find("ExitConfirmationButtons");
-            raycaster = pauseMenuRoot.transform.GetComponent<GraphicRaycaster>();
-
-            activeButtons = mainPauseButtons;
-            mainPauseButtons.gameObject.SetActive(true);
-            exitConfirmationButtons.gameObject.SetActive(false);
-            raycaster.enabled = false;
-        }
 
         private void ChangeActiveButtons(Transform newActiveButtons) {
             activeButtons.gameObject.SetActive(false);
@@ -68,12 +79,12 @@ namespace CameraScript.HUD {
             GameController.ResumeGame();
         }
 
-        private void UpdatePauseMenu() {
+        private void Update() {
             var lerpTarget = isPaused ? 1f : 0f;
-            pauseMenuRoot.alpha = Mathf.Lerp(pauseMenuRoot.alpha, lerpTarget, PauseLerpSpeed * Time.deltaTime);
+            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, lerpTarget, PauseLerpSpeed * Time.deltaTime);
 
-            if (Mathf.Abs(pauseMenuRoot.alpha - lerpTarget) < LerpEpsilon) {
-                pauseMenuRoot.alpha = lerpTarget;
+            if (Mathf.Abs(canvasGroup.alpha - lerpTarget) < LerpEpsilon) {
+                canvasGroup.alpha = lerpTarget;
 
                 if (isPaused)
                     raycaster.enabled = true;

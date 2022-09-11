@@ -1,5 +1,4 @@
-﻿using Character.Abilities.Tristian;
-using Character.Implementation.Enemy;
+﻿using Character.Implementation.Enemy;
 using Character.Implementation.Player;
 using Character.Misc;
 using Props;

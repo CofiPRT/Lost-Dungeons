@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Character.Implementation.Enemy.Groups {
     public abstract class GenericGroup : MonoBehaviour {

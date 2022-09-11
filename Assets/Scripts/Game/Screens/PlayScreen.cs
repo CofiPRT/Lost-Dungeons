@@ -22,6 +22,9 @@ namespace Game.Screens {
                 return;
             }
 
+            if (!GameController.ControlAllowed)
+                return;
+
             // handle topdown view
             if (Input.GetKeyDown(KeyCode.E) && TopdownViewController.Activate())
                 return;

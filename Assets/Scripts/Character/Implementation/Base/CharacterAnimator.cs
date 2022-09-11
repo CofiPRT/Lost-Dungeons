@@ -45,8 +45,6 @@ namespace Character.Implementation.Base {
         private float maxRightY;
 
         private void UpdateFootsteps() {
-            return;
-
             // if (leftFoot.localPosition.y < FootstepYThresholdLower && !leftFootLifted) {
             //     leftFootLifted = true;
             //     // Debug.Log("Left foot lifted");

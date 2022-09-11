@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Game;
+using Game.Util;
 using UnityEngine;
 
 namespace Character.Implementation.Enemy.Groups {
@@ -27,7 +28,7 @@ namespace Character.Implementation.Enemy.Groups {
                     enemy,
                     position + direction3D + Vector3.up * 0.5f,
                     Quaternion.LookRotation(-direction3D),
-                    GameController.SpawnContainer
+                    GameController.SpawnContainerEnemies
                 );
                 GameController.AliveEnemies.Add(spawnedEnemy);
 

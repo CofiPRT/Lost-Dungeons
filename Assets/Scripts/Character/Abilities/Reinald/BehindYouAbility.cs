@@ -1,7 +1,6 @@
 ﻿using Character.Implementation.Enemy;
 using Character.Implementation.Player;
 using Character.Misc;
-using UnityEngine;
 
 namespace Character.Abilities.Reinald {
     public class BehindYouAbility : Ability<BehindYouAbility> {

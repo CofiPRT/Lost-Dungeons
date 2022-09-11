@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using Properties;
 using UnityEngine;
 
 namespace Character.Implementation.Base {
     public abstract partial class GenericCharacter {
-        private Rigidbody RigidBody { get; set; }
+        private protected Rigidbody RigidBody { get; set; }
         private Collider Collider { get; set; }
         public bool IgnoreCollisions { get; set; }
 
+        public Vector3 UpdatedCenterOfMass => Pos + RigidBody.centerOfMass;
         public Vector3 CenterOfMass => RigidBody.worldCenterOfMass;
         private Vector3 ColliderYTop => Collider.bounds.center + Vector3.up * Collider.bounds.extents.y;
         public Vector3 EyePosition => Vector3.Lerp(CenterOfMass, ColliderYTop, 0.8f);
@@ -32,7 +34,7 @@ namespace Character.Implementation.Base {
         private void AwakeCollider() {
             RigidBody = GetComponent<Rigidbody>();
             Collider = GetComponent<Collider>();
-            CollisionLayers = LayerMask.GetMask(Properties.TeamUtils.AllLayers);
+            CollisionLayers = LayerMask.GetMask(TeamUtils.AllLayers);
         }
 
         public bool CanSee(Vector3 position, out RaycastHit hit, bool addEyeHeight = true) {

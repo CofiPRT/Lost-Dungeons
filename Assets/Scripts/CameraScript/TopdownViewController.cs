@@ -51,15 +51,21 @@ namespace CameraScript {
         }
 
         public static bool Activate() {
-            if (GameController.ControlledPlayer.CastBlocksAbilityUsage)
+            var player = GameController.ControlledPlayer;
+            if (player.CastBlocksAbilityUsage)
                 return false;
 
-            // move camera to topdown view - above the player and at a fixed angle
-            var playerPos = GameController.ControlledPlayer.Pos;
-            var cameraPos = playerPos + TopDownOffset;
-            var cameraForward = playerPos - cameraPos;
+            // move camera to topdown view - above the player and relative to the camera's orientation
+            var playerPos = player.Pos;
 
-            CameraController.SetCustomTarget(cameraPos, cameraForward, false);
+            // offset relative to player look direction
+            var cameraPos = playerPos +
+                            CameraController.Right * TopDownOffset.x +
+                            Vector3.up * TopDownOffset.y +
+                            CameraController.Forward * TopDownOffset.z;
+            var cameraRot = Quaternion.LookRotation(playerPos - cameraPos, Vector3.up);
+
+            CameraController.SetCustomTarget(cameraPos, cameraRot.eulerAngles, usePlayerForCollision: false);
             ScreenController.AddScreen(new TopDownScreen());
             GameController.ShowCursor();
 

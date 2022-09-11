@@ -1,6 +1,7 @@
 ﻿using CameraScript;
 using Character.Implementation.Player;
 using Character.Misc;
+using UnityEngine;
 
 namespace Character.Abilities.Reinald {
     public class SpiritFormAbility : Ability<SpiritFormAbility> {
@@ -57,7 +58,11 @@ namespace Character.Abilities.Reinald {
                 var position = ability.User.CenterOfMass
                                + ability.User.Forward * 3f
                                + ability.User.Right * 2f;
-                CameraController.SetCustomTarget(position, ability.User.EyePosition - position, true);
+                var rotation = Quaternion.LookRotation(
+                    ability.User.EyePosition - position,
+                    Vector3.up
+                );
+                CameraController.SetCustomTarget(position, rotation.eulerAngles);
             }
         }
 

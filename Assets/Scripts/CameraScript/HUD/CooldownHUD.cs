@@ -59,7 +59,7 @@ namespace CameraScript.HUD {
                 cooldown.Tick();
         }
 
-        public static void LerpTransparency(float coefficient) {
+        public static void LerpCooldownTransparency(float coefficient) {
             Instance.rootCanvasGroup.alpha = coefficient;
         }
 

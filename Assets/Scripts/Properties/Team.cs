@@ -1,4 +1,6 @@
-﻿namespace Properties {
+﻿using System;
+
+namespace Properties {
     public enum Team {
         Player,
         Ally,
@@ -11,7 +13,7 @@
                 "Player" => Team.Player,
                 "Ally" => Team.Ally,
                 "Enemy" => Team.Enemy,
-                _ => throw new System.Exception($"Unknown layer: {layer}")
+                _ => throw new Exception($"Unknown layer: {layer}")
             };
         }
 
@@ -20,7 +22,7 @@
                 Team.Player => "Player",
                 Team.Ally => "Ally",
                 Team.Enemy => "Enemy",
-                _ => throw new System.Exception($"Unknown membership: {membership}")
+                _ => throw new Exception($"Unknown membership: {membership}")
             };
         }
 

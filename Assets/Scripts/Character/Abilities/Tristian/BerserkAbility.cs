@@ -58,7 +58,11 @@ namespace Character.Abilities.Tristian {
                 var position = ability.User.CenterOfMass
                                + ability.User.Forward * 3f
                                + ability.User.Right * 2f;
-                CameraController.SetCustomTarget(position, ability.User.EyePosition - position, true);
+                var rotation = Quaternion.LookRotation(
+                    ability.User.EyePosition - position,
+                    Vector3.up
+                );
+                CameraController.SetCustomTarget(position, rotation.eulerAngles);
             }
         }
 

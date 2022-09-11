@@ -8,6 +8,8 @@ namespace Game {
         private bool dead;
         private float endTime;
 
+        public static bool IsFinished => Instance.finished;
+
         private void UpdateGameEnd() {
             if (!finished && !dead)
                 return;

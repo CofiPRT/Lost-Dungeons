@@ -1,5 +1,6 @@
 ﻿using Character.Implementation.Base;
 using Game;
+using Properties;
 using UnityEngine;
 
 namespace Character.Implementation.Enemy {
@@ -13,8 +14,8 @@ namespace Character.Implementation.Enemy {
                 maxHealth = 100,
                 attackDamage = 10,
 
-                attackStrength = Properties.AttackStrength.Strong,
-                blockStrength = Properties.BlockStrength.Medium
+                attackStrength = AttackStrength.Strong,
+                blockStrength = BlockStrength.Medium
             };
         }
 
@@ -46,7 +47,7 @@ namespace Character.Implementation.Enemy {
                     GameController.DefaultInstances.enemyWhite,
                     pos3D,
                     ownTransform.rotation,
-                    GameController.SpawnContainer
+                    GameController.SpawnContainerEnemies
                 );
             }
         }
